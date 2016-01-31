@@ -48,9 +48,10 @@ import net.imglib2.util.Intervals;
  * @author Stephan Saalfeld
  * @author Christian Dietz
  */
-public class PlanarSubsetCursor<T extends NativeType<T>> extends
-		AbstractCursorInt<T> implements PlanarImg.PlanarContainerSampler {
-	
+public class PlanarSubsetCursor< T extends NativeType< T > > extends
+		AbstractCursorInt< T > implements PlanarImg.PlanarContainerSampler
+{
+
 	/**
 	 * Access to the type
 	 */
@@ -59,23 +60,23 @@ public class PlanarSubsetCursor<T extends NativeType<T>> extends
 	/**
 	 * Container
 	 */
-	protected final PlanarImg<T, ?> container;
+	protected final PlanarImg< T, ? > container;
 
 	/**
 	 * Last index in plane
 	 */
 	protected final int lastIndexPlane;
-	
+
 	/**
 	 * Current slice index
 	 */
-	protected int sliceIndex;
+	protected int planeIndex;
 
 	/**
 	 * The current index of the type. It is faster to duplicate this here than
 	 * to access it through type.getIndex().
 	 */
-	protected int index;
+	protected int indexInPlane;
 
 	/**
 	 * Total offset in container to interval position
@@ -97,60 +98,66 @@ public class PlanarSubsetCursor<T extends NativeType<T>> extends
 	 */
 	protected final int lastIndexContainer;
 
-	protected PlanarSubsetCursor(final PlanarSubsetCursor<T> cursor) {
-		super(cursor.numDimensions());
+	protected PlanarSubsetCursor( final PlanarSubsetCursor< T > cursor )
+	{
+		super( cursor.numDimensions() );
 
 		container = cursor.container;
 		this.type = container.createLinkedType();
 
 		lastIndexPlane = cursor.lastIndexPlane;
-		sliceIndex = cursor.sliceIndex;
-		index = cursor.index;
+		planeIndex = cursor.planeIndex;
+		indexInPlane = cursor.indexInPlane;
 		offsetContainer = cursor.offsetContainer;
 		indexContainer = cursor.indexContainer;
 		planeSize = cursor.planeSize;
 		lastIndexContainer = cursor.lastIndexContainer;
 
-		type.updateContainer(this);
-		type.updateIndex(index);
+		type.updateContainer( this );
+		type.updateIndex( indexInPlane );
 	}
 
-	public PlanarSubsetCursor(final PlanarImg<T, ?> container, Interval interval) {
-		super(container.numDimensions());
+	public PlanarSubsetCursor( final PlanarImg< T, ? > container, Interval interval )
+	{
+		super( container.numDimensions() );
 
 		this.type = container.createLinkedType();
-		
+
 		this.container = container;
-		
-		this.offsetContainer = (int) offset(interval);
-		
-		this.planeSize = ((n > 1) ? ( int )container.dimension( 1 ) : 1)
+
+		this.offsetContainer = ( int ) offset( interval );
+
+		this.planeSize = ( ( n > 1 ) ? ( int ) container.dimension( 1 ) : 1 )
 				* ( int ) container.dimension( 0 );
 
 		this.lastIndexPlane = planeSize - 1;
 
-		this.lastIndexContainer = ( int ) (offsetContainer + Intervals.numElements( interval ) - 1);
-		
+		this.lastIndexContainer = ( int ) ( offsetContainer + Intervals.numElements( interval ) - 1 );
+
 		reset();
 	}
 
 	@Override
-	public int getCurrentSliceIndex() {
-		return sliceIndex;
+	public int getCurrentSliceIndex()
+	{
+		return planeIndex;
 	}
 
 	@Override
-	public T get() {
+	public T get()
+	{
 		return type;
 	}
 
 	@Override
-	public PlanarSubsetCursor<T> copy() {
-		return new PlanarSubsetCursor<T>(this);
+	public PlanarSubsetCursor< T > copy()
+	{
+		return new PlanarSubsetCursor< T >( this );
 	}
 
 	@Override
-	public PlanarSubsetCursor<T> copyCursor() {
+	public PlanarSubsetCursor< T > copyCursor()
+	{
 		return copy();
 	}
 
@@ -161,72 +168,82 @@ public class PlanarSubsetCursor<T extends NativeType<T>> extends
 	 * @return false for the last element
 	 */
 	@Override
-	public boolean hasNext() {
+	public boolean hasNext()
+	{
 		return indexContainer < lastIndexContainer;
 	}
 
 	@Override
-	public void fwd() {
+	public void fwd()
+	{
 		indexContainer++;
 
-		if (++index > lastIndexPlane) {
-			index = 0;
-			++sliceIndex;
-			type.updateContainer(this);
+		if ( ++indexInPlane > lastIndexPlane )
+		{
+			indexInPlane = 0;
+			++planeIndex;
+			type.updateContainer( this );
 		}
-		type.updateIndex(index);
+		type.updateIndex( indexInPlane );
 	}
 
 	@Override
-	public void jumpFwd(long steps) {
-		long newIndex = index + steps;
-		if (newIndex > lastIndexPlane) {
+	public void jumpFwd( long steps )
+	{
+		long newIndex = indexInPlane + steps;
+		if ( newIndex > lastIndexPlane )
+		{
 			final long s = newIndex / planeSize;
 			newIndex -= s * planeSize;
-			sliceIndex += s;
-			type.updateContainer(this);
+			planeIndex += s;
+			type.updateContainer( this );
 		}
-		index = (int) newIndex;
+		indexInPlane = ( int ) newIndex;
 		indexContainer += steps;
-		type.updateIndex(index);
+		type.updateIndex( indexInPlane );
 	}
 
 	@Override
-	public void reset() {
+	public void reset()
+	{
 
 		// Set current slice index
-		sliceIndex = offsetContainer / planeSize;
+		planeIndex = offsetContainer / planeSize;
 
 		// Set index inside the slice
-		index = offsetContainer % planeSize - 1;
+		indexInPlane = offsetContainer % planeSize - 1;
 
 		// Set total index to index
-		indexContainer = offsetContainer + index;
+		indexContainer = ( planeSize * planeIndex ) + indexInPlane;
 
-		type.updateIndex(index);
-		type.updateContainer(this);
+		type.updateIndex( indexInPlane );
+		type.updateContainer( this );
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return type.toString();
 	}
 
 	@Override
-	public void localize(final int[] position) {
-		container.indexToGlobalPosition(sliceIndex, index, position);
+	public void localize( final int[] position )
+	{
+		container.indexToGlobalPosition( planeIndex, indexInPlane, position );
 	}
 
 	@Override
-	public int getIntPosition(final int dim) {
-		return container.indexToGlobalPosition(sliceIndex, index, dim);
+	public int getIntPosition( final int dim )
+	{
+		return container.indexToGlobalPosition( planeIndex, indexInPlane, dim );
 	}
 
-	private long offset(final Interval interval) {
+	private long offset( final Interval interval )
+	{
 		final int maxDim = numDimensions() - 1;
-		long i = interval.min(maxDim);
-		for (int d = maxDim - 1; d >= 0; --d)
-			i = i * container.dimension(d) + interval.min(d);
+		long i = interval.min( maxDim );
+		for ( int d = maxDim - 1; d >= 0; --d )
+			i = i * container.dimension( d ) + interval.min( d );
 
 		return i;
 	}
