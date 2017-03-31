@@ -5,24 +5,68 @@
 	<parent>
 		<groupId>net.imglib2</groupId>
 		<artifactId>pom-imglib2</artifactId>
-		<version>7.0.0</version>
+		<version>9.0.0</version>
 	</parent>
 
 	<artifactId>imglib2</artifactId>
-	<version>2.6.1-SNAPSHOT</version>
+	<version>4.1.0-SNAPSHOT</version>
 
 	<name>ImgLib2 Core Library</name>
 	<description>A multidimensional, type-agnostic image processing library.</description>
-	<inceptionYear>2009</inceptionYear>
 	<url>http://imglib2.net/</url>
+	<inceptionYear>2009</inceptionYear>
+	<organization>
+		<name>ImgLib2</name>
+		<url>http://imglib2.net/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Simplified BSD License</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<mailingLists>
+		<mailingList>
+			<name>ImageJ Forum</name>
+			<archive>http://forum.imagej.net/</archive>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git://github.com/imglib/imglib2</connection>
+		<developerConnection>scm:git:git@github.com:imglib/imglib2</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/imglib/imglib2</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/imglib/imglib2/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/imglib/imglib2</url>
+	</ciManagement>
+
+	<properties>
+		<package-name>net.imglib2</package-name>
+
+		<license.licenseName>bsd_2</license.licenseName>
+		<license.projectName>ImgLib2: a general-purpose, multidimensional image processing library.</license.projectName>
+		<license.organizationName>ImgLib2 authors</license.organizationName>
+		<license.copyrightOwners>Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+Jean-Yves Tinevez and Michael Zinsmaier.</license.copyrightOwners>
+	</properties>
 
 	<developers>
 		<developer>
 			<id>tpietzsch</id>
 			<name>Tobias Pietzsch</name>
-			<email>tobias.pietzsch@gmail.com</email>
-			<organization>MPI-CBG at Dresden</organization>
-			<organizationUrl>http://mpi-cbg.de/</organizationUrl>
+			<url>http://imagej.net/User:Pietzsch</url>
 			<roles>
 				<role>lead</role>
 				<role>developer</role>
@@ -31,15 +75,11 @@
 				<role>support</role>
 				<role>maintainer</role>
 			</roles>
-			<timezone>+1</timezone>
 		</developer>
 		<developer>
 			<id>axtimwalde</id>
 			<name>Stephan Saalfeld</name>
-			<email>saalfelds@janelia.hhmi.org</email>
-			<url>http://www.janelia.org/lab/saalfeld-lab</url>
-			<organization>HHMI Janelia Research Campus</organization>
-			<organizationUrl>http://www.janelia.org/</organizationUrl>
+			<url>http://imagej.net/User:Saalfeld</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -49,15 +89,11 @@
 				<role>support</role>
 				<role>maintainer</role>
 			</roles>
-			<timezone>-5</timezone>
 		</developer>
 		<developer>
 			<id>StephanPreibisch</id>
 			<name>Stephan Preibisch</name>
-			<email>stephan.preibisch@gmx.de</email>
-			<url>http://fly.mpi-cbg.de/~preibisch/</url>
-			<organization>MPI-CBG at Dresden</organization>
-			<organizationUrl>http://mpi-cbg.de/</organizationUrl>
+			<url>http://imagej.net/User:StephanP</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -67,31 +103,14 @@
 				<role>support</role>
 				<role>maintainer</role>
 			</roles>
-			<timezone>+1</timezone>
 		</developer>
 		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<email>ctrueden@wisc.edu</email>
-			<url>http://loci.wisc.edu/people/curtis-rueden</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
+			<url>http://imagej.net/User:Rueden</url>
 			<roles>
 				<role>maintainer</role>
 			</roles>
-			<timezone>-6</timezone>
-		</developer>
-		<developer>
-			<id>hinerm</id>
-			<name>Mark Hiner</name>
-			<email>hiner@wisc.edu</email>
-			<url>http://loci.wisc.edu/people/mark-hiner</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
-			<roles>
-				<role>maintainer</role>
-			</roles>
-			<timezone>-6</timezone>
 		</developer>
 	</developers>
 	<contributors>
@@ -135,6 +154,11 @@
 			<properties><id>larrylindsey</id></properties>
 		</contributor>
 		<contributor>
+			<name>Ellen T Arena</name>
+			<url>http://imagej.net/User:Etarena</url>
+			<properties><id>etarena</id></properties>
+		</contributor>
+		<contributor>
 			<name>John Bogovic</name>
 			<url>http://imagej.net/User:Bogovic</url>
 			<properties><id>bogovicj</id></properties>
@@ -146,7 +170,7 @@
 		</contributor>
 		<contributor>
 			<name>Aivar Grislis</name>
-			<url>http://loci.wisc.edu/people/aivar-grislis</url>
+			<url>http://imagej.net/User:Grislis</url>
 			<properties><id>grislis</id></properties>
 		</contributor>
 		<contributor>
@@ -159,12 +183,18 @@
 			<properties><id>tnargsirrah</id></properties>
 		</contributor>
 		<contributor>
-			<name>Martin Horn</name>
-			<properties><id>hornm</id></properties>
+			<name>Stefan Helfrich</name>
+			<url>http://imagej.net/User:Stelfrich</url>
+			<properties><id>stelfrich</id></properties>
 		</contributor>
 		<contributor>
-			<name>Stefan Helfrich</name>
-			<properties><id>stelfrich</id></properties>
+			<name>Mark Hiner</name>
+			<url>http://imagej.net/User:Hinerm</url>
+			<properties><id>hinerm</id></properties>
+		</contributor>
+		<contributor>
+			<name>Martin Horn</name>
+			<properties><id>hornm</id></properties>
 		</contributor>
 		<contributor><name>Steffen Jaensch</name></contributor>
 		<contributor>
@@ -183,12 +213,8 @@
 			<properties><id>nickp</id></properties>
 		</contributor>
 		<contributor>
-			<name>Dimiter Prodanov</name>
-			<properties><id>dprodanov</id></properties>
-		</contributor>
-		<contributor>
 			<name>Alison Walter</name>
-			<url>http://loci.wisc.edu/people/alison-walter</url>
+			<url>http://imagej.net/User:Awalter2</url>
 			<properties><id>awalter17</id></properties>
 		</contributor>
 		<contributor>
@@ -196,21 +222,6 @@
 			<properties><id>MichaelZinsmaier</id></properties>
 		</contributor>
 	</contributors>
-
-	<scm>
-		<connection>scm:git:git://github.com/imglib/imglib2</connection>
-		<developerConnection>scm:git:git@github.com:imglib/imglib2</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://github.com/imglib/imglib2</url>
-	</scm>
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/imglib/imglib2/issues</url>
-	</issueManagement>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/ImgLib2/</url>
-	</ciManagement>
 
 	<dependencies>
 		<!-- Test dependencies -->
@@ -225,20 +236,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<packageName>net.imglib2</packageName>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>

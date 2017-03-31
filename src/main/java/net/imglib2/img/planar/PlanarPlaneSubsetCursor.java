@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -53,28 +53,28 @@ public class PlanarPlaneSubsetCursor< T extends NativeType< T >> extends
 	/**
 	 * Access to the type
 	 */
-	protected final T type;
+	private final T type;
 
 	/**
 	 * Container
 	 */
-	protected final PlanarImg< T, ? > container;
+	private final PlanarImg< T, ? > container;
 
 	/**
 	 * Current slice index
 	 */
-	protected final int sliceIndex;
+	private final int sliceIndex;
 
 	/**
 	 * Size of one plane
 	 */
-	protected final int planeSize;
-	
+	private final int planeSize;
+
 	/**
 	 * Last index on plane
 	 */
-	protected final int lastPlaneIndex;
-	
+	private final int lastPlaneIndex;
+
 	/**
 	 * Copy Constructor
 	 * 
@@ -101,7 +101,7 @@ public class PlanarPlaneSubsetCursor< T extends NativeType< T >> extends
 	 * @param container - the container this cursor shall work on.
 	 * @param interval - the interval to iterate over.
 	 */
-	public PlanarPlaneSubsetCursor( final PlanarImg< T, ? > container, Interval interval )
+	public PlanarPlaneSubsetCursor( final PlanarImg< T, ? > container, final Interval interval )
 	{
 		super( container.numDimensions() );
 
@@ -177,7 +177,7 @@ public class PlanarPlaneSubsetCursor< T extends NativeType< T >> extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final void jumpFwd( long steps )
+	public final void jumpFwd( final long steps )
 	{
 		type.incIndex( ( int ) steps );
 	}

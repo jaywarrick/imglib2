@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ import net.imglib2.type.numeric.NumericType;
  * {@link NumericType} itself, implementing the {@link NumericType} algebra as
  * element-wise operations.
  *
- * @author Stephan Saalfeld <saalfelds@janelia.hhmi.org>
+ * @author Stephan Saalfeld
  */
 abstract public class AbstractNumericComposite< T extends NumericType< T >, C extends AbstractNumericComposite< T, C > > extends AbstractComposite< T > implements NumericType< C >, Iterable< T >
 {
@@ -192,5 +192,22 @@ abstract public class AbstractNumericComposite< T extends NumericType< T >, C ex
 	{
 		sourceAccess.setPosition( -1, d );
 		return iterator;
+	}
+
+	@Override
+	public boolean valueEquals( C t )
+	{
+		if ( t.length == length )
+		{
+			final Iterator< T > a = iterator();
+			final Iterator< T > b = t.iterator();
+			while ( a.hasNext() )
+				if ( !a.next().valueEquals( b.next() ) )
+					return false;
+
+			return true;
+		}
+		else
+			return false;
 	}
 }

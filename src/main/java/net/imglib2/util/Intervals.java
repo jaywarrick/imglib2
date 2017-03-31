@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@
 package net.imglib2.util;
 
 import net.imglib2.Dimensions;
+import net.imglib2.FinalDimensions;
 import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.Interval;
@@ -45,7 +46,7 @@ import net.imglib2.RealLocalizable;
 /**
  * Convenience methods for manipulating {@link Interval Intervals}.
  * 
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
+ * @author Tobias Pietzsch
  */
 public class Intervals
 {
@@ -150,6 +151,50 @@ public class Intervals
 		}
 		return new FinalInterval( min, max );
 	}
+	
+	/**
+	 * Grow/shrink an interval in all dimensions.
+	 * 
+	 * Create a {@link FinalInterval}, which is the input interval plus border
+	 * pixels on every side, in every dimension.
+	 * 
+	 * @param interval
+	 *            the input interval
+	 * @param border
+	 *            how many pixels to add on every side
+	 * @return expanded interval
+	 */
+	public static FinalInterval expand( final Interval interval, final long ... border )
+	{
+		return expand(interval, new FinalDimensions( border ));
+	}
+	
+	/**
+	 * Grow/shrink an interval in all dimensions.
+	 * 
+	 * Create a {@link FinalInterval}, which is the input interval plus border
+	 * pixels on every side, in every dimension.
+	 * 
+	 * @param interval
+	 *            the input interval
+	 * @param border
+	 *            how many pixels to add on every side
+	 * @return expanded interval
+	 */
+	public static FinalInterval expand( final Interval interval, final Dimensions border )
+	{
+		final int n = interval.numDimensions();
+		final long[] min = new long[ n ];
+		final long[] max = new long[ n ];
+		interval.min( min );
+		interval.max( max );
+		for ( int d = 0; d < n; ++d )
+		{
+			min[ d ] -= border.dimension( d );
+			max[ d ] += border.dimension( d );
+		}
+		return new FinalInterval( min, max );
+	}
 
 	/**
 	 * Grow/shrink an interval in one dimensions.
@@ -226,6 +271,32 @@ public class Intervals
 		{
 			min[ d ] = Math.max( intervalA.min( d ), intervalB.min( d ) );
 			max[ d ] = Math.min( intervalA.max( d ), intervalB.max( d ) );
+		}
+		return new FinalInterval( min, max );
+	}
+
+	/**
+	 * Compute the smallest interval that contains both input intervals.
+	 * 
+	 * Create a {@link FinalInterval} that represents that interval.
+	 * 
+	 * @param intervalA
+	 *            input interval
+	 * @param intervalB
+	 *            input interval
+	 * @return union of input intervals
+	 */
+	public static FinalInterval union( final Interval intervalA, final Interval intervalB )
+	{
+		assert intervalA.numDimensions() == intervalB.numDimensions();
+
+		final int n = intervalA.numDimensions();
+		final long[] min = new long[ n ];
+		final long[] max = new long[ n ];
+		for ( int d = 0; d < n; ++d )
+		{
+			min[ d ] = Math.min( intervalA.min( d ), intervalB.min( d ) );
+			max[ d ] = Math.max( intervalA.max( d ), intervalB.max( d ) );
 		}
 		return new FinalInterval( min, max );
 	}

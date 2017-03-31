@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,31 +42,30 @@ import net.imglib2.img.basictypeaccess.array.LongArray;
 /**
  * A {@link Type} with arbitrary bit depth up to maximum 64 bits.
  * The behavior beyond 64 bits is undefined.
- * 
+ *
  * To set and get bits, we use longs. Therefore not more than 64 bits are supported. The long is not
  * supposed to have anything to do with math, it is simply an efficient way to hold an array of bits
- * 
+ *
  * The performance of this type is traded off for the gain in memory storage.
  * The {@link #setBits(long)} operation takes have the time as the {@link #getBits} operation.
  * The performance may degrade very slightly with increasing bit depth, but the decrease is barely noticeable.
  *
- * @author Albert Cardona and Stephan Preibisch
+ * @author Albert Cardona
+ * @author Stephan Preibisch
  */
 public abstract class AbstractBit64Type<T extends AbstractBit64Type<T>> extends AbstractBitType< T >
-{	
+{
 	// A mask for bit and, containing nBits of 1
 	private final long mask;
-	
+
 	// The inverse of mask
 	private final long invMask;
 
 	// this is the constructor if you want it to read from an array
-	public AbstractBit64Type(
-			final NativeImg< T, ? extends LongAccess> bitStorage,
-			final int nBits)
+	public AbstractBit64Type( final NativeImg< ?, ? extends LongAccess > bitStorage, final int nBits )
 	{
 		super( bitStorage, nBits );
-		
+
 		if ( nBits < 1 || nBits > 64 )
 			throw new IllegalArgumentException( "Supports only bit depths between 1 and 64, can't take " + nBits );
 		else if ( nBits == 64 )
@@ -79,7 +78,7 @@ public abstract class AbstractBit64Type<T extends AbstractBit64Type<T>> extends 
 	// this is the constructor if you want it to be a variable
 	public AbstractBit64Type( final long value, final int nBits )
 	{
-		this( ( NativeImg< T, ? extends LongAccess > )null, nBits );
+		this( ( NativeImg< ?, ? extends LongAccess > ) null, nBits );
 		updateIndex( 0 );
 		dataAccess = new LongArray( 1 );
 		setBits( value );
@@ -88,7 +87,7 @@ public abstract class AbstractBit64Type<T extends AbstractBit64Type<T>> extends 
 	// this is the constructor if you want to specify the dataAccess
 	public AbstractBit64Type( final LongAccess access, final int nBits )
 	{
-		this( (NativeImg< T, ? extends LongAccess > )null, nBits );
+		this( ( NativeImg< ?, ? extends LongAccess > ) null, nBits );
 		updateIndex( 0 );
 		dataAccess = access;
 	}
@@ -97,11 +96,11 @@ public abstract class AbstractBit64Type<T extends AbstractBit64Type<T>> extends 
 	public AbstractBit64Type( final int nBits ) { this( 0, nBits ); }
 
 	/**
-	 * Writes the current "subLong" location of the LongAccess into the lower nBits bits of the long value 
-	 * 
+	 * Writes the current "subLong" location of the LongAccess into the lower nBits bits of the long value
+	 *
 	 * Note that "long value" does not refer to math, it is just a way to help to return arbitrary values. It
 	 * is basically an array of bits.
-	 * 
+	 *
 	 * @return
 	 */
 	protected long getBits() {
@@ -128,10 +127,10 @@ public abstract class AbstractBit64Type<T extends AbstractBit64Type<T>> extends 
 
 	/**
 	 * Sets the lower nBits bits of the long value into the current "subLong" location of the LongAccess
-	 * 
+	 *
 	 * Note that "long value" does not refer to math, it is just a way to help to set arbitrary values. It
 	 * is basically an array of bits.
-	 * 
+	 *
 	 * @param value
 	 */
 	protected void setBits( final long value ) {

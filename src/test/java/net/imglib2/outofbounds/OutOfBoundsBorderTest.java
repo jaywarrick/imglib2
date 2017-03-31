@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,6 +35,13 @@
 package net.imglib2.outofbounds;
 
 import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import net.imglib2.Cursor;
 import net.imglib2.Localizable;
 import net.imglib2.img.Img;
@@ -46,17 +53,11 @@ import net.imglib2.img.list.ListImgFactory;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.view.ExtendedRandomAccessibleInterval;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 /**
- * 
- * 
- * @author Stephan Saalfeld <saalfeld@mpi-cbg.de>
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
+ *
+ *
+ * @author Stephan Saalfeld
+ * @author Tobias Pietzsch
  */
 public class OutOfBoundsBorderTest
 {
@@ -64,7 +65,7 @@ public class OutOfBoundsBorderTest
 
 	static private ArrayImg< IntType, ? > arrayImage;
 
-	static private CellImg< IntType, ?, ? > cellImage;
+	static private CellImg< IntType, ? > cellImage;
 
 	static private Img< IntType > listImage;
 

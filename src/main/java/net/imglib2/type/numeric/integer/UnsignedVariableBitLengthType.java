@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,19 +48,18 @@ import net.imglib2.util.Util;
 /**
  * A {@link Type} with arbitrary bit depth up to maximum 64 bits.
  * The behavior beyond 64 bits is undefined.
- * 
+ *
  * The performance of this type is traded off for the gain in memory storage.
  * The {@link #set(long)} operation takes have the time as the {@link #get} operation.
  * The performance may degrade very slightly with increasing bit depth, but the decrease is barely noticeable.
  *
- * @author Albert Cardona and Stephan Preibisch
+ * @author Albert Cardona
+ * @author Stephan Preibisch
  */
 public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVariableBitLengthType> implements IntegerType< UnsignedVariableBitLengthType >
 {
 	// this is the constructor if you want it to read from an array
-	public UnsignedVariableBitLengthType(
-			final NativeImg<UnsignedVariableBitLengthType, ? extends LongAccess> bitStorage,
-			final int nBits)
+	public UnsignedVariableBitLengthType( final NativeImg< ?, ? extends LongAccess > bitStorage, final int nBits )
 	{
 		super( bitStorage, nBits );
 	}
@@ -75,10 +74,10 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public UnsignedVariableBitLengthType( final int nBits ) { super(nBits ); }
 
 	@Override
-	public NativeImg<UnsignedVariableBitLengthType, ? extends LongAccess> createSuitableNativeImg( final NativeImgFactory<UnsignedVariableBitLengthType> storageFactory, final long dim[] )
+	public NativeImg< UnsignedVariableBitLengthType, ? extends LongAccess > createSuitableNativeImg( final NativeImgFactory< UnsignedVariableBitLengthType > storageFactory, final long dim[] )
 	{
 		// create the container
-		final NativeImg<UnsignedVariableBitLengthType, ? extends LongAccess> container = storageFactory.createLongInstance( dim, getEntitiesPerPixel() );
+		final NativeImg< UnsignedVariableBitLengthType, ? extends LongAccess > container = storageFactory.createLongInstance( dim, getEntitiesPerPixel() );
 
 		// create a Type that is linked to the container
 		final UnsignedVariableBitLengthType linkedType = new UnsignedVariableBitLengthType( container, nBits );
@@ -90,9 +89,9 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	}
 
 	public void set( final long value ) { setBits( value ); }
-	
+
 	public long get() { return getBits(); }
-	
+
 	@Override
 	public void set( final UnsignedVariableBitLengthType c ) { setBits( c.getBits() ); }
 
@@ -108,11 +107,11 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	/** @see UnsignedLongType#divide(long, long) */
 	@Override
 	public void div(final UnsignedVariableBitLengthType t) { setBits( UnsignedLongType.divide( getBits(), t.getBits() ) ); }
-	
+
 	/** @see UnsignedLongType#compare(long, long) */
 	@Override
 	public int compareTo( final UnsignedVariableBitLengthType t ) { return UnsignedLongType.compare( getBits(), t.getBits() ); }
-	
+
 	@Override
 	public void mul( final float c ) { setReal( getRealDouble() * c ); }
 	@Override
@@ -122,16 +121,16 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public float getRealFloat() { return getIntegerLong(); }
 	@Override
 	public double getRealDouble() { return getIntegerLong(); }
-	
+
 	@Override
 	public void setReal( final float real ){ setInteger( Util.round( real ) ); }
 	@Override
-	public void setReal( final double real ){ setInteger( Util.round( real ) ); }	
+	public void setReal( final double real ){ setInteger( Util.round( real ) ); }
 
 	@Override
 	public void setZero() { setInteger( 0 ); }
 	@Override
-	public void setOne() { setInteger( 1 ); }	
+	public void setOne() { setInteger( 1 ); }
 
 	@Override
 	public int getBitsPerPixel() { return nBits; }
@@ -139,8 +138,8 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public double getMinIncrement() { return 1; }
 
 	@Override
-	public String toString() { return "" + getIntegerLong(); }	
-	
+	public String toString() { return "" + getIntegerLong(); }
+
 	@Override
 	public int getInteger() { return (int)get(); }
 
@@ -160,7 +159,7 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public void setInteger( final long f ) { setBits( f ); }
 
 	@Override
-	public void setBigInteger(BigInteger b) { setBits( b.longValue() ); }
+	public void setBigInteger(final BigInteger b) { setBits( b.longValue() ); }
 
 	/** The maximum value that can be stored is {@code Math.pow(2, nBits) -1}. */
 	@Override
@@ -187,7 +186,7 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public float getImaginaryFloat() { return 0; }
 	@Override
 	public double getImaginaryDouble() { return 0; }
-	
+
 	@Override
 	public void setImaginary( final float complex ){}
 	@Override
@@ -202,7 +201,7 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 	public float getPowerFloat() { return getRealFloat(); }
 	@Override
 	public double getPowerDouble() { return getRealDouble(); }
-	
+
 	@Override
 	public void setComplexNumber( final float r, final float i ) { setReal( r ); }
 	@Override
@@ -210,4 +209,16 @@ public class UnsignedVariableBitLengthType extends AbstractBit64Type<UnsignedVar
 
 	@Override
 	public void complexConjugate(){}
+
+	/**
+	 * Default test at long precision.  Please override for types longer than 64bit.
+	 *
+	 * @param t
+	 * @return
+	 */
+	@Override
+	public boolean valueEquals( final UnsignedVariableBitLengthType t )
+	{
+		return getBits() == t.getBits();
+	}
 }

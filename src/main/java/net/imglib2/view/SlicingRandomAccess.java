@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,17 +34,21 @@
 
 package net.imglib2.view;
 
-import net.imglib2.AbstractEuclideanSpace;
+import java.util.Arrays;
+
+import net.imglib2.AbstractLocalizable;
 import net.imglib2.Localizable;
 import net.imglib2.RandomAccess;
 import net.imglib2.transform.integer.Slicing;
 
 /**
- * 
+ * Wrap a {@code source} RandomAccess which is related to this by a
+ * {@link Slicing} {@code transformToSource}.
+ *
  * @param <T>
  * @author Tobias Pietzsch
  */
-public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements RandomAccess< T >
+public class SlicingRandomAccess< T > extends AbstractLocalizable implements RandomAccess< T >
 {
 	/**
 	 * source RandomAccess. note that this is the <em>target</em> of the
@@ -57,6 +61,12 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 	 * numTargetDimensions of the Slicing transform.
 	 */
 	private final int m;
+
+	/**
+	 * for each component of the source vector: should the value be taken to a
+	 * target vector component (false) or should it be discarded (true).
+	 */
+	private final boolean[] sourceZero;
 
 	/**
 	 * for each component of the source vector: to which target vector component
@@ -83,12 +93,18 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		transformToSource.getComponentZero( targetZero );
 		transformToSource.getComponentMapping( targetComponent );
 
+		sourceZero = new boolean[ n ];
 		sourceComponent = new int[ n ];
+		Arrays.fill( sourceZero, true );
 		for ( int d = 0; d < m; ++d )
-			if ( transformToSource.getComponentZero( d ) )
+			if ( targetZero[ d ] )
 				s.setPosition( transformToSource.getTranslation( d ), d );
 			else
-				sourceComponent[ transformToSource.getComponentMapping( d ) ] = d;
+			{
+				final int e = targetComponent[ d ];
+				sourceZero[ e ] = false;
+				sourceComponent[ e ] = d;
+			}
 
 		tmpPosition = new long[ m ];
 		transformToSource.getTranslation( tmpPosition );
@@ -101,95 +117,46 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		super( randomAccess.numDimensions() );
 		s = randomAccess.s.copyRandomAccess();
 		m = randomAccess.m;
+		sourceZero = randomAccess.sourceZero.clone();
 		sourceComponent = randomAccess.sourceComponent.clone();
 		tmpPosition = randomAccess.tmpPosition.clone();
 		tmpDistance = randomAccess.tmpDistance.clone();
 	}
 
 	@Override
-	public void localize( final int[] position )
-	{
-		assert position.length >= n;
-		for ( int d = 0; d < n; ++d )
-			position[ d ] = getIntPosition( d );
-	}
-
-	@Override
-	public void localize( final long[] position )
-	{
-		assert position.length >= n;
-		for ( int d = 0; d < n; ++d )
-			position[ d ] = getLongPosition( d );
-	}
-
-	@Override
-	public int getIntPosition( final int d )
-	{
-		assert d < n;
-		return s.getIntPosition( sourceComponent[ d ] );
-	}
-
-	@Override
-	public long getLongPosition( final int d )
-	{
-		assert d < n;
-		return s.getLongPosition( sourceComponent[ d ] );
-	}
-
-	@Override
-	public void localize( final float[] position )
-	{
-		assert position.length >= n;
-		for ( int d = 0; d < n; ++d )
-			position[ d ] = getFloatPosition( d );
-	}
-
-	@Override
-	public void localize( final double[] position )
-	{
-		assert position.length >= n;
-		for ( int d = 0; d < n; ++d )
-			position[ d ] = getDoublePosition( d );
-	}
-
-	@Override
-	public float getFloatPosition( final int d )
-	{
-		assert d < n;
-		return s.getFloatPosition( sourceComponent[ d ] );
-	}
-
-	@Override
-	public double getDoublePosition( final int d )
-	{
-		assert d < n;
-		return s.getDoublePosition( sourceComponent[ d ] );
-	}
-
-	@Override
 	public void fwd( final int d )
 	{
-		s.fwd( sourceComponent[ d ] );
+		assert d < n;
+		++position[ d ];
+		if ( !sourceZero[ d ] )
+			s.fwd( sourceComponent[ d ] );
 	}
 
 	@Override
 	public void bck( final int d )
 	{
-		s.bck( sourceComponent[ d ] );
+		assert d < n;
+		--position[ d ];
+		if ( !sourceZero[ d ] )
+			s.bck( sourceComponent[ d ] );
 	}
 
 	@Override
 	public void move( final int distance, final int d )
 	{
 		assert d < n;
-		s.move( distance, sourceComponent[ d ] );
+		position[ d ] += distance;
+		if ( !sourceZero[ d ] )
+			s.move( distance, sourceComponent[ d ] );
 	}
 
 	@Override
 	public void move( final long distance, final int d )
 	{
 		assert d < n;
-		s.move( distance, sourceComponent[ d ] );
+		position[ d ] += distance;
+		if ( !sourceZero[ d ] )
+			s.move( distance, sourceComponent[ d ] );
 	}
 
 	@Override
@@ -202,7 +169,12 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// tmpDistance[].
 		// however, the missing components are already assigned to 0
 		for ( int d = 0; d < n; ++d )
-			tmpDistance[ sourceComponent[ d ] ] = localizable.getLongPosition( d );
+		{
+			final long distance = localizable.getLongPosition( d );
+			position[ d ] += distance;
+			if ( !sourceZero[ d ] )
+				tmpDistance[ sourceComponent[ d ] ] = distance;
+		}
 		s.move( tmpDistance );
 	}
 
@@ -216,7 +188,11 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// tmpDistance[].
 		// however, the missing components are already assigned to 0
 		for ( int d = 0; d < n; ++d )
-			tmpDistance[ sourceComponent[ d ] ] = distance[ d ];
+		{
+			position[ d ] += distance[ d ];
+			if ( !sourceZero[ d ] )
+				tmpDistance[ sourceComponent[ d ] ] = distance[ d ];
+		}
 		s.move( tmpDistance );
 	}
 
@@ -230,7 +206,11 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// tmpDistance[].
 		// however, the missing components are already assigned to 0
 		for ( int d = 0; d < n; ++d )
-			tmpDistance[ sourceComponent[ d ] ] = distance[ d ];
+		{
+			position[ d ] += distance[ d ];
+			if ( !sourceZero[ d ] )
+				tmpDistance[ sourceComponent[ d ] ] = distance[ d ];
+		}
 		s.move( tmpDistance );
 	}
 
@@ -245,7 +225,12 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// however, the missing components are already assigned to the correct
 		// translation components.
 		for ( int d = 0; d < n; ++d )
-			tmpPosition[ sourceComponent[ d ] ] = localizable.getLongPosition( d );
+		{
+			final long p = localizable.getLongPosition( d );
+			position[ d ] = p;
+			if ( !sourceZero[ d ] )
+				tmpPosition[ sourceComponent[ d ] ] = p;
+		}
 		s.setPosition( tmpPosition );
 	}
 
@@ -260,7 +245,12 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// however, the missing components are already assigned to the correct
 		// translation components.
 		for ( int d = 0; d < n; ++d )
-			tmpPosition[ sourceComponent[ d ] ] = position[ d ];
+		{
+			final long p = position[ d ];
+			this.position[ d ] = p;
+			if ( !sourceZero[ d ] )
+				tmpPosition[ sourceComponent[ d ] ] = p;
+		}
 		s.setPosition( tmpPosition );
 	}
 
@@ -275,7 +265,12 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 		// however, the missing components are already assigned to the correct
 		// translation components.
 		for ( int d = 0; d < n; ++d )
-			tmpPosition[ sourceComponent[ d ] ] = position[ d ];
+		{
+			final long p = position[ d ];
+			this.position[ d ] = p;
+			if ( !sourceZero[ d ] )
+				tmpPosition[ sourceComponent[ d ] ] = p;
+		}
 		s.setPosition( tmpPosition );
 	}
 
@@ -283,14 +278,18 @@ public class SlicingRandomAccess< T > extends AbstractEuclideanSpace implements 
 	public void setPosition( final int position, final int d )
 	{
 		assert d < n;
-		s.setPosition( position, sourceComponent[ d ] );
+		this.position[ d ] = position;
+		if ( !sourceZero[ d ] )
+			s.setPosition( position, sourceComponent[ d ] );
 	}
 
 	@Override
 	public void setPosition( final long position, final int d )
 	{
 		assert d < n;
-		s.setPosition( position, sourceComponent[ d ] );
+		this.position[ d ] = position;
+		if ( !sourceZero[ d ] )
+			s.setPosition( position, sourceComponent[ d ] );
 	}
 
 	@Override

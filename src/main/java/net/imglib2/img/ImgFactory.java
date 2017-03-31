@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.imglib2.util.Util;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -52,7 +52,7 @@ public abstract class ImgFactory< T >
 	 * The {@link ImgFactory} can decide how to create the {@link Img}. A
 	 * {@link NativeImgFactory} will ask the {@link Type} to create a suitable
 	 * {@link NativeImg}.
-	 * 
+	 *
 	 * @return {@link Img}
 	 */
 	public abstract Img< T > create( final long[] dim, final T type );
@@ -61,7 +61,7 @@ public abstract class ImgFactory< T >
 	 * The {@link ImgFactory} can decide how to create the {@link Img}. A
 	 * {@link NativeImgFactory} will ask the {@link Type} to create a suitable
 	 * {@link NativeImg}.
-	 * 
+	 *
 	 * @return {@link Img}
 	 */
 	public Img< T > create( final Dimensions dim, final T type )
@@ -76,7 +76,7 @@ public abstract class ImgFactory< T >
 	 * The {@link ImgFactory} can decide how to create the {@link Img}. A
 	 * {@link NativeImgFactory} will ask the {@link Type} to create a suitable
 	 * {@link NativeImg}.
-	 * 
+	 *
 	 * @return {@link Img}
 	 */
 	public Img< T > create( final int[] dim, final T type )
@@ -87,18 +87,18 @@ public abstract class ImgFactory< T >
 	/**
 	 * Creates the same {@link ImgFactory} for a different generic parameter if
 	 * possible.
-	 * 
+	 *
 	 * If the type "S" does not suit the needs of the {@link ImgFactory} (for
 	 * example implement {@link NativeType} in all {@link NativeImgFactory},
 	 * this method will throw an {@link IncompatibleTypeException}.
-	 * 
+	 *
 	 * @param <S>
-	 *            - the new type
+	 *            the new type
 	 * @param type
-	 *            - an instance of S
+	 *            an instance of S
 	 * @return {@link ImgFactory} of type S
 	 * @throws IncompatibleTypeException
-	 *             if type <S> is not compatible
+	 *             if type S is not compatible
 	 */
 	public abstract < S > ImgFactory< S > imgFactory( final S type ) throws IncompatibleTypeException;
 }

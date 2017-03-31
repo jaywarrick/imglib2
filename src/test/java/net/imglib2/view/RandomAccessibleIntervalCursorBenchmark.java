@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,16 +44,13 @@ import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.basictypeaccess.array.IntArray;
 import net.imglib2.img.cell.CellImg;
 import net.imglib2.img.cell.CellImgFactory;
-import net.imglib2.img.cell.DefaultCell;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.util.BenchmarkHelper;
 import net.imglib2.util.IntervalIndexer;
 
 /**
- * 
- * @author ImgLib2 developers
+ *
  * @author Tobias Pietzsch
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
  */
 public class RandomAccessibleIntervalCursorBenchmark
 {
@@ -67,7 +64,7 @@ public class RandomAccessibleIntervalCursorBenchmark
 
 	ArrayImg< IntType, IntArray > array2;
 
-	CellImg< IntType, IntArray, DefaultCell< IntArray > > cell;
+	CellImg< IntType, IntArray > cell;
 
 	@SuppressWarnings( "unchecked" )
 	public void setUp()
@@ -75,7 +72,7 @@ public class RandomAccessibleIntervalCursorBenchmark
 		dimensions = new long[] { 207, 103, 1021 };
 		array1 = ( ArrayImg< IntType, IntArray > ) new ArrayImgFactory< IntType >().create( dimensions, new IntType() );
 		array2 = ( ArrayImg< IntType, IntArray > ) new ArrayImgFactory< IntType >().create( dimensions, new IntType() );
-		cell = ( CellImg< IntType, IntArray, DefaultCell< IntArray > > ) new CellImgFactory< IntType >().create( dimensions, new IntType() );
+		cell = ( CellImg< IntType, IntArray > ) new CellImgFactory< IntType >().create( dimensions, new IntType() );
 
 		// fill intData with random values
 		numValues = 1;

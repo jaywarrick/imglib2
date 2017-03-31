@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,8 +45,9 @@ import net.imglib2.util.IntervalIndexer;
  * is: row by row, plane by plane, cube by cube, ... This is useful for
  * iterating an arbitrary interval in a defined order. For that, connect a
  * {@link ZeroMinIntervalIterator} to a {@link Positionable}.
- * 
+ *
  * <pre>
+ * {@code
  * ...
  * ZeroMinIntervalIterator i = new ZeroMinIntervalIterator(image);
  * RandomAccess<T> s = image.randomAccess();
@@ -57,17 +58,17 @@ import net.imglib2.util.IntervalIndexer;
  *   ...
  * }
  * ...
+ * }
  * </pre>
- * 
+ *
  * Note that {@link ZeroMinIntervalIterator} is the right choice in situations
  * where <em>not</em> for each pixel you want to localize and/or set the
  * {@link Positionable} [{@link Sampler}], that is in a sparse sampling
  * situation. For localizing at each iteration step (as in the simplified
  * example above), use {@link LocalizingZeroMinIntervalIterator} instead.
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
- * @author Stephan Saalfeld <saalfeld@mpi-cbg.de>
  */
 public class ZeroMinIntervalIterator extends IntervalIterator
 {

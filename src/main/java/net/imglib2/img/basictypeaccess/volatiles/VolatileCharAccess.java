@@ -1,23 +1,19 @@
 /*
  * #%L
- * ImgLib2: a general-purpose, multidimensional image processing library.
+ * BigDataViewer core classes with minimal dependencies
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2012 - 2016 Tobias Pietzsch, Stephan Saalfeld, Stephan Preibisch,
+ * Jean-Yves Tinevez, HongKee Moon, Johannes Schindelin, Curtis Rueden, John Bogovic
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,32 +27,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+package net.imglib2.img.basictypeaccess.volatiles;
 
-package net.imglib2.img.cell;
+import net.imglib2.img.basictypeaccess.CharAccess;
 
-import net.imglib2.img.basictypeaccess.array.ArrayDataAccess;
-import net.imglib2.util.Fraction;
 
 /**
- * Default (empty) implementation of the {@link AbstractCell}.
- * 
- * 
- * @author ImgLib2 developers
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
+ * @author Stephan Saalfeld
+ * @author Tobias Pietzsch
  */
-public final class DefaultCell< A extends ArrayDataAccess< A > > extends AbstractCell< A >
-{
-	private final A data;
-
-	public DefaultCell( final A creator, final int[] dimensions, final long[] min, final Fraction entitiesPerPixel )
-	{
-		super( dimensions, min );
-		this.data = creator.createArray( (int)entitiesPerPixel.mulCeil( numPixels ) );
-	}
-
-	@Override
-	public A getData()
-	{
-		return data;
-	}
-}
+public interface VolatileCharAccess extends CharAccess, VolatileAccess
+{}

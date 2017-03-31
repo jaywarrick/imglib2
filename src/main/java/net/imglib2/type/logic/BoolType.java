@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,14 +33,17 @@
  */
 package net.imglib2.type.logic;
 
+import java.math.BigInteger;
+
 import net.imglib2.type.BooleanType;
+import net.imglib2.type.numeric.integer.AbstractIntegerType;
 
 /**
  * A {@link BooleanType} wrapping a single primitive {@code boolean} variable.
  *
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
+ * @author Tobias Pietzsch
  */
-public class BoolType implements BooleanType< BoolType >
+public class BoolType extends AbstractIntegerType< BoolType > implements BooleanType< BoolType >
 {
 	boolean value;
 
@@ -135,5 +138,65 @@ public class BoolType implements BooleanType< BoolType >
 	public void not()
 	{
 		value = !value;
+	}
+
+	@Override
+	public double getMaxValue()
+	{
+		return 1;
+	}
+
+	@Override
+	public double getMinValue()
+	{
+		return 0;
+	}
+
+	@Override
+	public int getBitsPerPixel()
+	{
+		return 1;
+	}
+
+	@Override
+	public int getInteger()
+	{
+		return get() ? 1 : 0;
+	}
+
+	@Override
+	public long getIntegerLong()
+	{
+		return get() ? 1 : 0;
+	}
+
+	@Override
+	public BigInteger getBigInteger()
+	{
+		return get() ? BigInteger.ONE : BigInteger.ZERO;
+	}
+
+	@Override
+	public void setInteger( final int f )
+	{
+		set( f >= 1 );
+	}
+
+	@Override
+	public void setInteger( final long f )
+	{
+		set( f >= 1 );
+	}
+
+	@Override
+	public void setBigInteger( final BigInteger b )
+	{
+		set( b.compareTo(BigInteger.ZERO) > 0 );
+	}
+	
+	@Override
+	public boolean valueEquals( BoolType t )
+	{
+		return get() == t.get();
 	}
 }

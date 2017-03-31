@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,6 +38,9 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Random;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
@@ -46,12 +49,9 @@ import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.util.IntervalIndexer;
 
-import org.junit.Before;
-import org.junit.Test;
-
 /**
  * TODO
- * 
+ *
  */
 public class CopyTest
 {
@@ -63,7 +63,7 @@ public class CopyTest
 
 	long intDataSum;
 
-	CellImg< IntType, ?, ? > intImg;
+	CellImg< IntType, ? > intImg;
 
 	@Before
 	public void createSourceData()
@@ -170,7 +170,7 @@ public class CopyTest
 	@Test
 	public void testCopyToCellContainerWithSourceIteration()
 	{
-		final CellImg< IntType, ?, ? > cellImg = new CellImgFactory< IntType >( new int[] { 2, 7, 4 } ).create( dimensions, new IntType() );
+		final CellImg< IntType, ? > cellImg = new CellImgFactory< IntType >( new int[] { 2, 7, 4 } ).create( dimensions, new IntType() );
 		copyWithSourceIteration( intImg, cellImg );
 		assertArrayEquals( intData, getImgAsInts( cellImg ) );
 	}
@@ -178,7 +178,7 @@ public class CopyTest
 	@Test
 	public void testCopyToCellContainerWithDestIteration()
 	{
-		final CellImg< IntType, ?, ? > cellImg = new CellImgFactory< IntType >( new int[] { 2, 7, 4 } ).create( dimensions, new IntType() );
+		final CellImg< IntType, ? > cellImg = new CellImgFactory< IntType >( new int[] { 2, 7, 4 } ).create( dimensions, new IntType() );
 		copyWithDestIteration( intImg, cellImg );
 		assertArrayEquals( intData, getImgAsInts( cellImg ) );
 	}

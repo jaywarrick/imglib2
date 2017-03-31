@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -61,5 +61,42 @@ public class ValuePair< A, B > implements Pair< A, B >
 	public B getB()
 	{
 		return b;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( a == null ) ? 0 : a.hashCode() );
+		result = prime * result + ( ( b == null ) ? 0 : b.hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if ( this == obj )
+			return true;
+		if ( obj == null )
+			return false;
+		if ( !(obj instanceof Pair) )
+			return false;
+		Pair other = (Pair) obj;
+		if ( a == null )
+		{
+			if ( other.getA() != null )
+				return false;
+		}
+		else if ( !a.equals( other.getA() ) )
+			return false;
+		if ( b == null )
+		{
+			if ( other.getB() != null )
+				return false;
+		}
+		else if ( !b.equals( other.getB() ) )
+			return false;
+		return true;
 	}
 }

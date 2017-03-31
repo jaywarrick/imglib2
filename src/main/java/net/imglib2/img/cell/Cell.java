@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,36 +34,31 @@
 
 package net.imglib2.img.cell;
 
-import java.io.Serializable;
-
 import net.imglib2.util.IntervalIndexer;
+import net.imglib2.util.Intervals;
 
 /**
- * A cell of an {@link CellImg}.
- * 
- * @author ImgLib2 developers
- * @author Tobias Pietzsch <tobias.pietzsch@gmail.com>
+ * A cell of an {@link AbstractCellImg}.
+ *
+ * @author Tobias Pietzsch
  */
-public abstract class AbstractCell< A > implements Serializable
+public class Cell< A >
 {
-	private static final long serialVersionUID = 1L;
+	protected final int n;
 
-	protected int n;
+	protected final int[] dimensions;
 
-	protected int[] dimensions;
+	protected final int[] steps;
 
-	protected int[] steps;
+	protected final long[] min;
 
-	protected long[] min;
+	protected final long[] max;
 
-	protected long[] max;
+	private final int numPixels;
 
-	protected int numPixels;
+	private final A data;
 
-	public AbstractCell()
-	{}
-
-	public AbstractCell( final int[] dimensions, final long[] min )
+	public Cell( final int[] dimensions, final long[] min, final A data )
 	{
 		this.n = dimensions.length;
 		this.dimensions = dimensions.clone();
@@ -75,18 +70,20 @@ public abstract class AbstractCell< A > implements Serializable
 		for ( int d = 0; d < n; ++d )
 			max[ d ] = min[ d ] + dimensions[ d ] - 1;
 
-		int nPixels = dimensions[ 0 ];
-		for ( int d = 1; d < n; ++d )
-			nPixels *= dimensions[ d ];
-		numPixels = nPixels;
+		numPixels = ( int ) Intervals.numElements( dimensions );
+
+		this.data = data;
 	}
 
 	/**
 	 * Get the basic type array that stores this cells pixels.
-	 * 
+	 *
 	 * @return underlying basic type array.
 	 */
-	public abstract A getData();
+	public A getData()
+	{
+		return data;
+	}
 
 	public long size()
 	{
@@ -106,21 +103,20 @@ public abstract class AbstractCell< A > implements Serializable
 	}
 
 	/**
-	 * compute the index in the underlying flat array of this cell which
-	 * corresponds to a local position (i.e., relative to the origin of this
-	 * cell).
-	 * 
+	 * Compute the index in the underlying flat array of this cell which
+	 * corresponds to the specified global {@code position}.
+	 *
 	 * @param position
-	 *            a local position
+	 *            a global position
 	 * @return corresponding index
 	 */
-	public int localPositionToIndex( final long[] position )
+	public int globalPositionToIndex( final long[] position )
 	{
-		return IntervalIndexer.positionToIndex( position, dimensions );
+		return IntervalIndexer.positionWithOffsetToIndex( position, dimensions, min );
 	}
 
 	/**
-	 * 
+	 *
 	 * @param d
 	 *            dimension
 	 * @return minimum
@@ -132,8 +128,8 @@ public abstract class AbstractCell< A > implements Serializable
 
 	/**
 	 * Write the minimum of each dimension into long[].
-	 * 
-	 * @param minValue
+	 *
+	 * @param minimum
 	 */
 	public void min( final long[] minimum )
 	{
@@ -143,7 +139,7 @@ public abstract class AbstractCell< A > implements Serializable
 
 	/**
 	 * Get the number of pixels in a given dimension <em>d</em>.
-	 * 
+	 *
 	 * @param d
 	 */
 	public int dimension( final int d )
@@ -153,8 +149,8 @@ public abstract class AbstractCell< A > implements Serializable
 
 	/**
 	 * Write the number of pixels in each dimension into long[].
-	 * 
-	 * @param dimensions
+	 *
+	 * @param dim
 	 */
 	public void dimensions( final int[] dim )
 	{

@@ -2,22 +2,22 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -55,7 +55,7 @@ import net.imglib2.view.iteration.SubIntervalIterable;
  * The {@link PlanarImg} provides access to the underlying data arrays via the
  * {@link #getPlane(int)} method.
  * </p>
- * 
+ *
  * @author Jan Funke
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
@@ -118,7 +118,7 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 		}
 		else
 		{
-			final int numEntitiesPerSlice = (int)entitiesPerPixel.mulCeil( ( ( n > 1 ) ? dimensions[ 1 ] : 1 )  *  dimensions[ 0 ] ); 
+			final int numEntitiesPerSlice = ( int ) entitiesPerPixel.mulCeil( ( ( n > 1 ) ? dimensions[ 1 ] : 1 ) * dimensions[ 0 ] );
 			for ( int i = 0; i < numSlices; ++i )
 				mirror.add( creator.createArray( numEntitiesPerSlice ) );
 		}
@@ -152,12 +152,12 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	}
 
 	/**
-	 * For a given >=2d location, estimate the pixel index in the stack slice.
-	 * 
+	 * For a given &ge;2d location, estimate the pixel index in the stack slice.
+	 *
 	 * @param l
 	 * @return
-	 * 
-	 *         TODO: remove this method? (it doesn't seem to be used anywhere)
+	 *
+	 * 		TODO: remove this method? (it doesn't seem to be used anywhere)
 	 */
 	public final int getIndex( final int[] l )
 	{
@@ -169,14 +169,14 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	/**
 	 * Compute a global position from the index of a slice and an index within
 	 * that slice.
-	 * 
+	 *
 	 * @param sliceIndex
 	 *            index of slice
 	 * @param indexInSlice
 	 *            index of element within slice
 	 * @param position
 	 *            receives global position of element
-	 * 
+	 *
 	 *            TODO: move this method to AbstractPlanarCursor? (that seems to
 	 *            be the only place where it is needed)
 	 */
@@ -209,7 +209,7 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	/**
 	 * Compute a global position from the index of a slice and an index within
 	 * that slice.
-	 * 
+	 *
 	 * @param sliceIndex
 	 *            index of slice
 	 * @param indexInSlice
@@ -217,7 +217,7 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	 * @param dim
 	 *            which dimension of the position we are interested in
 	 * @return dimension dim of global position
-	 * 
+	 *
 	 *         TODO: move this method to AbstractPlanarCursor? (that seems to be
 	 *         the only place where it is needed)
 	 */
@@ -307,35 +307,8 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	@Override
 	public boolean supportsOptimizedCursor( final Interval interval )
 	{
-		// first check whether the interval is completely contained.
-		if ( !Intervals.contains( this, interval ) )
-			return false;
-
 		// we want to optimize exactly one plane
-		if ( correspondsToPlane( interval ) )
-		{
-			return true;
-		}
-		else
-		{
-			// we want to optimize a set of planes
-
-			// find the first dimension in which image and interval differ
-			int dimIdx = 0;
-			for ( ; dimIdx < n; ++dimIdx )
-				if ( interval.dimension( dimIdx ) != dimension( dimIdx ) )
-					break;
-
-			// in the dimension after that, image and interval may differ
-			++dimIdx;
-
-			// but image extents of all higher dimensions must equal 1
-			for ( int d = dimIdx; d < n; ++d )
-				if ( interval.dimension( d ) != 1 )
-					return false;
-
-			return true;
-		}
+		return Intervals.contains( this, interval ) && correspondsToPlane( interval );
 	}
 
 	/**
@@ -353,11 +326,9 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	@Override
 	public Cursor< T > cursor( final Interval interval )
 	{
-		assert supportsOptimizedCursor( interval );
+		assert ( supportsOptimizedCursor( interval ) );
 
-		if ( correspondsToPlane( interval ) )
-			return new PlanarPlaneSubsetCursor< T >( this, interval );
-		return new PlanarSubsetCursor< T >( this, interval );
+		return new PlanarPlaneSubsetCursor< T >( this, interval );
 	}
 
 	private boolean correspondsToPlane( final Interval interval )
@@ -365,6 +336,9 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 		// check if interval describes one plane
 		if ( interval.dimension( 0 ) != dimension[ 0 ] )
 			return false;
+
+		if ( dimension.length == 1 )
+			return true;
 
 		if ( interval.dimension( 1 ) != dimension[ 1 ] )
 			return false;
@@ -384,11 +358,8 @@ public class PlanarImg< T extends NativeType< T >, A extends ArrayDataAccess< A 
 	@Override
 	public Cursor< T > localizingCursor( final Interval interval )
 	{
+		assert ( supportsOptimizedCursor( interval ) );
 
-		assert supportsOptimizedCursor( interval );
-
-		if ( correspondsToPlane( interval ) )
-			return new PlanarPlaneSubsetLocalizingCursor< T >( this, interval );
-		return new PlanarSubsetLocalizingCursor< T >( this, interval );
+		return new PlanarPlaneSubsetLocalizingCursor< T >( this, interval );
 	}
 }

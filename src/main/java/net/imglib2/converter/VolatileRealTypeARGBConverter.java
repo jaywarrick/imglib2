@@ -2,12 +2,12 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2015 Tobias Pietzsch, Stephan Preibisch, Barry DeZonia,
- * Stephan Saalfeld, Curtis Rueden, Albert Cardona, Christian Dietz, Jean-Yves
- * Tinevez, Johannes Schindelin, Jonathan Hale, Lee Kamentsky, Larry Lindsey, Mark
- * Hiner, Michael Zinsmaier, Martin Horn, Grant Harris, Aivar Grislis, John
- * Bogovic, Steffen Jaensch, Stefan Helfrich, Jan Funke, Nick Perry, Mark Longair,
- * Melissa Linkert and Dimiter Prodanov.
+ * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
+ * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
+ * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
+ * Mark Longair, Brian Northan, Nick Perry, Curtis Rueden, Johannes Schindelin,
+ * Jean-Yves Tinevez and Michael Zinsmaier.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,20 +40,32 @@ import net.imglib2.type.volatiles.VolatileRealType;
 /**
  * Converts a {@link VolatileRealType} to an {@link ARGBType}.
  * 
- * @author Stephan Saalfeld <saalfeld@mpi-cbg.de>
+ * @author Stephan Saalfeld
  */
 public class VolatileRealTypeARGBConverter extends RealARGBConverter< VolatileRealType< ? > >
 {
-	final protected ARGBType background = new ARGBType( 0xff000040 );
+	final protected ARGBType background;
 
-	public VolatileRealTypeARGBConverter()
+	public VolatileRealTypeARGBConverter( final ARGBType background )
 	{
 		super();
+		this.background = background;
+	}
+	
+	public VolatileRealTypeARGBConverter()
+	{
+		this( new ARGBType( 0xff000040 ) );
+	}
+	
+	public VolatileRealTypeARGBConverter( final double min, final double max, final ARGBType background )
+	{
+		super( min, max );
+		this.background = background;
 	}
 
 	public VolatileRealTypeARGBConverter( final double min, final double max )
 	{
-		super( min, max );
+		this( min, max, new ARGBType( 0xff000040 ) );
 	}
 
 	@Override
