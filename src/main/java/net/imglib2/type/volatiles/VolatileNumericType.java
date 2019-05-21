@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -38,7 +38,7 @@ import net.imglib2.type.numeric.NumericType;
 
 /**
  * Something volatile that has a value and is either VALID or INVALID.
- * 
+ *
  * @author Stephan Saalfeld
  */
 public class VolatileNumericType< T extends NumericType< T > > extends AbstractVolatileNumericType< T, VolatileNumericType< T > >
@@ -50,18 +50,18 @@ public class VolatileNumericType< T extends NumericType< T > > extends AbstractV
 
 	public VolatileNumericType( final T t )
 	{
-		this( t, false );
+		this( t, true );
 	}
 
 	@Override
 	public VolatileNumericType< T > createVariable()
 	{
-		return new VolatileNumericType< T >( t.createVariable(), false );
+		return new VolatileNumericType< T >( t.createVariable(), true );
 	}
 
 	@Override
 	public VolatileNumericType< T > copy()
 	{
-		return new VolatileNumericType< T >( t.copy(), false );
+		return new VolatileNumericType< T >( t.copy(), valid );
 	}
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -31,6 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package net.imglib2.type.numeric.integer;
 
 import static org.junit.Assert.assertEquals;
@@ -39,21 +40,29 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
+/**
+ * Tests for {@link ShortType} functionality.
+ *
+ * @author Gabe Selzer
+ *
+ */
 
-public class ShortTypeTest {
+public class ShortTypeTest
+{
 
 	/**
 	 * Test which verifies {@link ShortType#getBigInteger()} returns the
 	 * {@code BigInteger} representation of a ShortType.
 	 */
 	@Test
-	public void testGetBigInteger() {
+	public void testGetBigInteger()
+	{
 
-		final ShortType l = new ShortType( (short) 31498 );
+		final ShortType l = new ShortType( ( short ) 31498 );
 		assertEquals( BigInteger.valueOf( 31498l ), l.getBigInteger() );
 
-		final ShortType l2 = new ShortType( (short) -24691 );
-		assertEquals( BigInteger.valueOf( -24691l ) , l2.getBigInteger() );
+		final ShortType l2 = new ShortType( ( short ) -24691 );
+		assertEquals( BigInteger.valueOf( -24691l ), l2.getBigInteger() );
 	}
 
 	/**
@@ -62,15 +71,102 @@ public class ShortTypeTest {
 	 * value.
 	 */
 	@Test
-	public void testSetBigInteger() {
+	public void testSetBigInteger()
+	{
 
-		final ShortType l = new ShortType( (short) 1082 );
+		final ShortType l = new ShortType( ( short ) 1082 );
 
-		assertEquals( l.get(), (short) 1082 );
+		assertEquals( l.get(), ( short ) 1082 );
 
 		final BigInteger bi = BigInteger.valueOf( 48906l );
 		l.setBigInteger( bi );
-		assertEquals( l.get(), (short) -16630 );
+		assertEquals( l.get(), ( short ) -16630 );
+	}
+
+	/**
+	 * Test which verifies {@link ShortType#add(ShortType)}
+	 */
+	@Test
+	public void testAdd()
+	{
+		final ShortType l = new ShortType( ( short ) 20000 );
+
+		l.add( new ShortType( ( short ) 5 ) );
+
+		assertEquals( l.get(), ( short ) 20005 );
+
+		final ShortType m = new ShortType( Short.MAX_VALUE );
+
+		m.add( new ShortType( ( short ) 1 ) );
+
+		assertEquals( m.get(), Short.MIN_VALUE );
+	}
+
+	/**
+	 * Test which verifies {@link ShortType#sub(ShortType)}
+	 */
+	@Test
+	public void testSub()
+	{
+		final ShortType l = new ShortType( ( short ) 20000 );
+
+		l.sub( new ShortType( ( short ) 5 ) );
+
+		assertEquals( l.get(), ( short ) 19995 );
+
+		final ShortType m = new ShortType( Short.MIN_VALUE );
+
+		m.sub( new ShortType( ( short ) 1 ) );
+
+		assertEquals( m.get(), Short.MAX_VALUE );
+	}
+
+	/**
+	 * Test which verifies {@link ShortType#mul(ShortType)}
+	 */
+	@Test
+	public void testMul()
+	{
+		final ShortType l = new ShortType( ( short ) 125 );
+
+		l.mul( new ShortType( ( short ) 5 ) );
+
+		assertEquals( l.get(), ( short ) 625 );
+
+		final ShortType m = new ShortType( ( short ) 16384 );
+
+		m.mul( new ShortType( ( short ) 2 ) );
+
+		assertEquals( m.get(), Short.MIN_VALUE );
+	}
+
+	/**
+	 * Test which verifies {@link ShortType#div(ShortType)}
+	 */
+	@Test
+	public void testDiv()
+	{
+		final ShortType l = new ShortType( ( short ) 125 );
+
+		l.div( new ShortType( ( short ) 5 ) );
+
+		assertEquals( l.get(), ( short ) 25 );
+
+		final ShortType m = new ShortType( ( short ) 17 );
+
+		m.div( new ShortType( ( short ) 2 ) );
+
+		assertEquals( m.get(), ( short ) 8 );
+	}
+
+	@Test( expected = ArithmeticException.class )
+	public void testDivByZero()
+	{
+		final ShortType n = new ShortType( ( short ) 17 );
+
+		n.div( new ShortType( ( short ) 0 ) );
+
+		assertEquals( n.get(), ( short ) 8 );
 	}
 
 }

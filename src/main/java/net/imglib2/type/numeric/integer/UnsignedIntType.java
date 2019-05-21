@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -37,14 +37,13 @@ package net.imglib2.type.numeric.integer;
 import java.math.BigInteger;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.IntAccess;
-import net.imglib2.util.Fraction;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.util.Util;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -95,38 +94,31 @@ public class UnsignedIntType extends GenericIntType< UnsignedIntType >
 	}
 
 	@Override
-	public NativeImg< UnsignedIntType, ? extends IntAccess > createSuitableNativeImg( final NativeImgFactory< UnsignedIntType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg<UnsignedIntType, ? extends IntAccess> container = storageFactory.createIntInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final UnsignedIntType linkedType = new UnsignedIntType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public UnsignedIntType duplicateTypeOnSameNativeImg()
 	{
 		return new UnsignedIntType( img );
 	}
 
+	private static final NativeTypeFactory< UnsignedIntType, IntAccess > typeFactory = NativeTypeFactory.INT( UnsignedIntType::new );
+
+	@Override
+	public NativeTypeFactory< UnsignedIntType, IntAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
+	}
+
 	@Override
 	public void mul( final float c )
 	{
-		final long a = getUnsignedInt( getValue() );
-		setValue( getCodedSignedInt( Util.round( a * c ) ) );
+		final long a = getUnsignedInt( getInt() );
+		setInt( getCodedSignedInt( Util.round( a * c ) ) );
 	}
 
 	@Override
 	public void mul( final double c )
 	{
-		final long a = getUnsignedInt( getValue() );
-		setValue( getCodedSignedInt( ( int ) Util.round( a * c ) ) );
+		final long a = getUnsignedInt( getInt() );
+		setInt( getCodedSignedInt( ( int ) Util.round( a * c ) ) );
 	}
 
 	@Override
@@ -185,12 +177,12 @@ public class UnsignedIntType extends GenericIntType< UnsignedIntType >
 
 	public long get()
 	{
-		return getUnsignedInt( getValue() );
+		return getUnsignedInt( getInt() );
 	}
 
 	public void set( final long f )
 	{
-		setValue( getCodedSignedInt( f ) );
+		setInt( getCodedSignedInt( f ) );
 	}
 
 	@Override
@@ -224,9 +216,15 @@ public class UnsignedIntType extends GenericIntType< UnsignedIntType >
 	}
 
 	@Override
-	public void setBigInteger(BigInteger b)
+	public void setBigInteger( final BigInteger b )
 	{
 		set( b.longValue() );
+	}
+
+	@Override
+	public void setReal( float real )
+	{
+		set( Util.roundToLong( real ) );
 	}
 
 	@Override
@@ -242,28 +240,6 @@ public class UnsignedIntType extends GenericIntType< UnsignedIntType >
 	}
 
 	@Override
-	public int hashCode()
-	{
-		// NB: Use the same hash code as java.lang.Long#hashCode().
-		final long value = get();
-		return (int) (value ^ (value >>> 32));
-	}
-
-	@Override
-	public int compareTo( final UnsignedIntType c )
-	{
-		final long a = get();
-		final long b = c.get();
-
-		if ( a > b )
-			return 1;
-		else if ( a < b )
-			return -1;
-		else
-			return 0;
-	}
-
-	@Override
 	public UnsignedIntType createVariable()
 	{
 		return new UnsignedIntType( 0 );
@@ -273,5 +249,11 @@ public class UnsignedIntType extends GenericIntType< UnsignedIntType >
 	public UnsignedIntType copy()
 	{
 		return new UnsignedIntType( get() );
+	}
+
+	@Override
+	public int compareTo( final UnsignedIntType other )
+	{
+		return Long.compare( get(), other.get() );
 	}
 }

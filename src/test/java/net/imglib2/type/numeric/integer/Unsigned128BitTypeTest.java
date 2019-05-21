@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -54,8 +54,8 @@ public class Unsigned128BitTypeTest
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
 	{
-		
-		img = new ArrayImgFactory< Unsigned128BitType >().create( new long[]{ 10, 20, 30 }, new Unsigned128BitType() );
+
+		img = new ArrayImgFactory<>( new Unsigned128BitType() ).create( 10, 20, 30 );
 	}
 
 	/**
@@ -163,4 +163,16 @@ public class Unsigned128BitTypeTest
 		assertEquals( l.get(), bi );
 	}
 
+	@Test
+	public void testGetRealDouble() {
+		assertEquals( 0.0, new Unsigned128BitType( 0, 0 ).getRealDouble(), 0.0 );
+		assertEquals( Math.pow( 2, 128 ), new Unsigned128BitType( -1, -1 ).getRealDouble(), 0.0 );
+	}
+
+	@Test
+	public void testGetRealFloat() {
+		assertEquals( 0.0, new Unsigned128BitType( 0, 0 ).getRealFloat(), 0.0 );
+		assertEquals( Math.pow( 2, 127 ), (float) Math.pow( 2, 127 ), 0.0 );
+		assertEquals( Math.pow( 2, 127 ), new Unsigned128BitType(0, 1l << 63 ).getRealFloat(), 0.0 );
+	}
 }

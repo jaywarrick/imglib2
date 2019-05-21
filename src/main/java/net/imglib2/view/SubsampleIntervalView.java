@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -67,7 +67,7 @@ public class SubsampleIntervalView< T > extends SubsampleView< T > implements Ra
 		for ( int d = 0; d < steps.length; ++d )
 		{
 			steps[ d ] = step;
-			dimensions[ d ] = source.dimension( d ) / step;
+			dimensions[ d ] = ( int )Math.ceil( ( double )source.dimension( d ) / step );
 			max[ d ] = dimensions[ d ] - 1;
 		}
 	}
@@ -81,7 +81,7 @@ public class SubsampleIntervalView< T > extends SubsampleView< T > implements Ra
 		for ( int d = 0; d < steps.length; ++d )
 		{
 			this.steps[ d ] = steps[ d ];
-			dimensions[ d ] = source.dimension( d ) / steps[ d ];
+			dimensions[ d ] = ( int )Math.ceil( ( double )source.dimension( d ) / steps[ d ]);
 			max[ d ] = dimensions[ d ] - 1;
 		}
 	}

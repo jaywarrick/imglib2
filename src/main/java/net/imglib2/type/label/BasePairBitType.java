@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,10 +35,10 @@
 package net.imglib2.type.label;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.LongAccess;
 import net.imglib2.type.AbstractBit64Type;
 import net.imglib2.type.BasePairType;
+import net.imglib2.type.NativeTypeFactory;
 
 /**
  * Representation of base pairs using 3 bits per entry, supported characters: gap, N, A, T, G, C, U
@@ -49,18 +49,63 @@ import net.imglib2.type.BasePairType;
  */
 public class BasePairBitType extends AbstractBit64Type< BasePairBitType > implements BasePairType< BasePairBitType >
 {
-	public static enum Base { gap, N, A, T, G, C, U; }
+	// hom many bits a BasePairBitType contains
+	private static final int NBITS = 3;
+
+	public enum Base
+	{
+		gap( ' ' ),
+		N( 'N' ),
+		A( 'A' ),
+		T( 'T' ),
+		G( 'G' ),
+		C( 'C' ),
+		U( 'U' );
+
+		private final char c;
+
+		Base( final char c )
+		{
+			this.c = c;
+		}
+
+		public char getChar()
+		{
+			return c;
+		}
+
+		public static Base fromChar( final char c )
+		{
+			switch ( c )
+			{
+			case 'A':
+				return A;
+			case 'T':
+				return T;
+			case 'G':
+				return G;
+			case 'C':
+				return C;
+			case 'U':
+				return U;
+			case ' ':
+				return gap;
+			default:
+				return N;
+			}
+		}
+	}
 
 	// this is the constructor if you want it to read from an array
 	public BasePairBitType( final NativeImg< ?, ? extends LongAccess > bitStorage )
 	{
-		super( bitStorage, 3 );
+		super( bitStorage, NBITS );
 	}
 
 	// this is the constructor if you want it to be a variable
 	public BasePairBitType( final Base value )
 	{
-		super( value.ordinal() );
+		super( value.ordinal(), NBITS );
 	}
 
 	// this is the constructor if you want it to be a variable
@@ -70,23 +115,15 @@ public class BasePairBitType extends AbstractBit64Type< BasePairBitType > implem
 	}
 
 	@Override
-	public NativeImg< BasePairBitType, ? extends LongAccess > createSuitableNativeImg( final NativeImgFactory< BasePairBitType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg< BasePairBitType, ? extends LongAccess > container = storageFactory.createLongInstance( dim, getEntitiesPerPixel() );
-
-		// create a Type that is linked to the container
-		final BasePairBitType linkedType = new BasePairBitType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public BasePairBitType duplicateTypeOnSameNativeImg() { return new BasePairBitType( img ); }
 
+	private static final NativeTypeFactory< BasePairBitType, LongAccess > typeFactory = NativeTypeFactory.LONG( BasePairBitType::new );
+
+	@Override
+	public NativeTypeFactory< BasePairBitType, LongAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
+	}
 
 	@Override
 	public void set( final Base base )
@@ -97,29 +134,13 @@ public class BasePairBitType extends AbstractBit64Type< BasePairBitType > implem
 	@Override
 	public Base get()
 	{
-		return Base.values()[ (int)getBits() ];
+		return Base.values()[ ( int ) getBits() ];
 	}
 
 	@Override
 	public int compareTo( final BasePairBitType c )
 	{
-		final Base input = get();
-		final Base compare = c.get();
-
-		if ( input == compare )
-		{
-			return 0;
-		}
-		switch ( input )
-		{
-			case gap: return -1;
-			case N: return compare == Base.gap ? 1 : -1;
-			case A: return compare == Base.gap || compare == Base.N ? 1 : -1;
-			case T: return compare == Base.G || compare == Base.C || compare == Base.U ? -1 : 1;
-			case G: return compare == Base.C || compare == Base.U ? -1 : 1;
-			case C: return compare == Base.U ? -1 : 1;
-			default: return 1;
-		}
+		return get().compareTo( c.get() );
 	}
 
 	@Override
@@ -140,25 +161,7 @@ public class BasePairBitType extends AbstractBit64Type< BasePairBitType > implem
 	@Override
 	public byte baseToValue()
 	{
-		final Base base = get();
-
-		switch ( base )
-		{
-		case N:
-			return 1;
-		case A:
-			return 2;
-		case T:
-			return 3;
-		case G:
-			return 4;
-		case C:
-			return 5;
-		case U:
-			return 6;
-		default:
-			return 0;
-		}
+		return ( byte ) get().ordinal();
 	}
 
 	@Override

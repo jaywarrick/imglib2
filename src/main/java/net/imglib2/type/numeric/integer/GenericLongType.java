@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,6 +37,7 @@ import net.imglib2.img.NativeImg;
 import net.imglib2.img.basictypeaccess.LongAccess;
 import net.imglib2.img.basictypeaccess.array.LongArray;
 import net.imglib2.type.NativeType;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.util.Fraction;
 import net.imglib2.util.Util;
 
@@ -45,8 +46,8 @@ import net.imglib2.util.Util;
  *
  * @author Mark Hiner
  */
-public abstract class GenericLongType < T extends GenericLongType< T >> extends AbstractIntegerType< T > implements NativeType< T > {
-
+public abstract class GenericLongType< T extends GenericLongType< T > > extends AbstractIntegerType< T > implements NativeType< T >
+{
 	int i = 0;
 
 	final protected NativeImg< ?, ? extends LongAccess > img;
@@ -65,7 +66,7 @@ public abstract class GenericLongType < T extends GenericLongType< T >> extends 
 	{
 		img = null;
 		dataAccess = new LongArray( 1 );
-		setValue( value );
+		setLong( value );
 	}
 
 	// this is the constructor if you want to specify the dataAccess
@@ -82,7 +83,10 @@ public abstract class GenericLongType < T extends GenericLongType< T >> extends 
 	}
 
 	@Override
-	public Fraction getEntitiesPerPixel() { return new Fraction(); }
+	public Fraction getEntitiesPerPixel()
+	{
+		return new Fraction();
+	}
 
 	@Override
 	public void updateContainer( final Object c )
@@ -90,109 +94,117 @@ public abstract class GenericLongType < T extends GenericLongType< T >> extends 
 		dataAccess = img.update( c );
 	}
 
+	@Override
+	public abstract NativeTypeFactory< T, LongAccess > getNativeTypeFactory();
+
+	/**
+	 * @deprecated Use {@link #getLong()} instead.
+	 */
+	@Deprecated
 	protected long getValue()
 	{
 		return dataAccess.getValue( i );
 	}
 
+	/**
+	 * @deprecated Use {@link #setLong(long)} instead.
+	 */
+	@Deprecated
 	protected void setValue( final long f )
 	{
 		dataAccess.setValue( i, f );
 	}
 
+	/**
+	 * Returns the primitive long value that is used to store this type.
+	 *
+	 * @return primitive long value
+	 */
+	public long getLong()
+	{
+		return dataAccess.getValue( i );
+	}
+
+	/**
+	 * Sets the primitive long value that is used to store this type.
+	 */
+	public void setLong( final long f )
+	{
+		dataAccess.setValue( i, f );
+	}
 
 	@Override
 	public void mul( final float c )
 	{
-		setValue( Util.round( getValue() * c ) );
+		setLong( Util.round( getLong() * c ) );
 	}
 
 	@Override
 	public void mul( final double c )
 	{
-		setValue( Util.round( getValue() * c ) );
+		setLong( Util.round( getLong() * c ) );
 	}
 
 	@Override
 	public void add( final T c )
 	{
-		setValue( getValue() + c.getValue() );
+		setLong( getLong() + c.getLong() );
 	}
 
 	@Override
 	public void div( final T c )
 	{
-		setValue( getValue() / c.getValue() );
+		setLong( getLong() / c.getLong() );
 	}
 
 	@Override
 	public void mul( final T c )
 	{
-		setValue( getValue() * c.getValue() );
+		setLong( getLong() * c.getLong() );
 	}
 
 	@Override
 	public void sub( final T c )
 	{
-		setValue( getValue() - c.getValue() );
-	}
-
-	@Override
-	public int hashCode()
-	{
-		// NB: Use the same hash code as java.lang.Long#hashCode().
-		return ( (Long)getValue() ).hashCode();
-	}
-
-	@Override
-	public int compareTo( final T c )
-	{
-		final long a = getValue();
-		final long b = c.getValue();
-		if ( a > b )
-			return 1;
-		else if ( a < b )
-			return -1;
-		else
-			return 0;
+		setLong( getLong() - c.getLong() );
 	}
 
 	@Override
 	public void set( final T c )
 	{
-		setValue( c.getValue() );
+		setLong( c.getLong() );
 	}
 
 	@Override
 	public void setOne()
 	{
-		setValue( 1 );
+		setLong( 1 );
 	}
 
 	@Override
 	public void setZero()
 	{
-		setValue( 0 );
+		setLong( 0 );
 	}
 
 	@Override
 	public void inc()
 	{
-		long a = getValue();
-		setValue( ++a );
+		long a = getLong();
+		setLong( ++a );
 	}
 
 	@Override
 	public void dec()
 	{
-		long a = getValue();
-		setValue( --a );
+		long a = getLong();
+		setLong( --a );
 	}
 
 	@Override
 	public String toString()
 	{
-		return "" + getValue();
+		return "" + getLong();
 	}
 
 	@Override
@@ -238,8 +250,30 @@ public abstract class GenericLongType < T extends GenericLongType< T >> extends 
 	}
 
 	@Override
-	public boolean valueEquals( T t )
+	public int compareTo( final T other )
 	{
-		return getValue() == t.getValue();
+		return Long.compare( getLong(), other.getLong() );
+	}
+
+	@Override
+	public boolean valueEquals( final T other )
+	{
+		return getLong() == other.getLong();
+	}
+
+	@Override
+	public boolean equals( final Object obj )
+	{
+		if ( !getClass().isInstance( obj ) )
+			return false;
+		@SuppressWarnings( "unchecked" )
+		final T t = ( T ) obj;
+		return GenericLongType.this.valueEquals( t );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Long.hashCode( getLong() );
 	}
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -40,10 +40,10 @@ import net.imglib2.RandomAccess;
 
 /**
  * {@link RandomAccess} on a {@link ListImg}.
- * 
+ *
  * @param <T>
  *            the pixel type
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  * @author Tobias Pietzsch
@@ -137,10 +137,12 @@ public class ListRandomAccess< T > extends AbstractLocalizableInt implements Ran
 	@Override
 	public void setPosition( final Localizable localizable )
 	{
-		localizable.localize( position );
-		i = position[ 0 ];
+		position[ 0 ] = i = localizable.getIntPosition( 0 );
 		for ( int d = 1; d < n; ++d )
+		{
+			position[ d ] = localizable.getIntPosition( d );
 			i += position[ d ] * img.step[ d ];
+		}
 	}
 
 	@Override

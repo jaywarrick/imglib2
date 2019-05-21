@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -48,11 +48,16 @@ public interface Localizable extends RealLocalizable
 {
 	/**
 	 * Write the current position into the passed array.
-	 * 
+	 *
 	 * @param position
 	 *            receives current position
 	 */
-	public void localize( int[] position );
+	default void localize( final int[] position )
+	{
+		final int n = numDimensions();
+		for ( int d = 0; d < n; d++ )
+			position[ d ] = getIntPosition( d );
+	}
 
 	/**
 	 * Write the current position into the passed array.
@@ -60,16 +65,24 @@ public interface Localizable extends RealLocalizable
 	 * @param position
 	 *            receives current position
 	 */
-	public void localize( long[] position );
+	default void localize( final long[] position )
+	{
+		final int n = numDimensions();
+		for ( int d = 0; d < n; d++ )
+			position[ d ] = getIntPosition( d );
+	}
 
 	/**
 	 * Return the current position in a given dimension.
-	 * 
+	 *
 	 * @param d
 	 *            dimension
 	 * @return dimension of current position
 	 */
-	public int getIntPosition( int d );
+	default int getIntPosition( final int d )
+	{
+		return (int) getLongPosition( d );
+	}
 
 	/**
 	 * Return the current position in a given dimension.
@@ -79,4 +92,16 @@ public interface Localizable extends RealLocalizable
 	 * @return dimension of current position
 	 */
 	public long getLongPosition( int d );
+
+	@Override
+	default float getFloatPosition( final int d )
+	{
+		return getLongPosition( d );
+	}
+
+	@Override
+	default double getDoublePosition( final int d )
+	{
+		return getLongPosition( d );
+	}
 }

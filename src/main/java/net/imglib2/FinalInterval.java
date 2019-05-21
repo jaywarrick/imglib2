@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -135,6 +135,27 @@ public final class FinalInterval extends AbstractInterval
 		{
 			min[ d ] = minmax[ d ];
 			max[ d ] = minmax[ d + n ];
+		}
+		return new FinalInterval( min, max );
+	}
+
+	/**
+	 * Create an Interval with the given minimum coordinates and size.
+	 * 
+	 * @param min
+	 *            the minimum of the interval
+	 * @param size
+	 *            the dimensions of the interval
+	 * @return interval with the specified boundaries
+	 */
+	public static FinalInterval createMinSize( final long[] min, final long[] size )
+	{
+		final int n = min.length;
+		assert n == size.length;
+		final long[] max = new long[ n ];
+		for ( int d = 0; d < n; ++d )
+		{
+			max[ d ] = min[ d ] + size[ d ] - 1;
 		}
 		return new FinalInterval( min, max );
 	}

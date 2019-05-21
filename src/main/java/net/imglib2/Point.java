@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -36,7 +36,7 @@ package net.imglib2;
 
 /**
  * A Point is a position in Euclidean space specified in integer coordinates.
- * 
+ *
  * @author Lee Kamentsky
  * @author Tobias Pietzsch
  */
@@ -44,7 +44,7 @@ public class Point extends AbstractLocalizable implements Positionable
 {
 	/**
 	 * Protected constructor that can re-use the passed position array.
-	 * 
+	 *
 	 * @param position
 	 *            array used to store the position.
 	 * @param copy
@@ -57,7 +57,7 @@ public class Point extends AbstractLocalizable implements Positionable
 
 	/**
 	 * Create a point in <i>nDimensional</i> space initialized to 0,0,...
-	 * 
+	 *
 	 * @param n
 	 *            number of dimensions of the space
 	 */
@@ -69,7 +69,7 @@ public class Point extends AbstractLocalizable implements Positionable
 	/**
 	 * Create a point at a definite location in a space of the dimensionality of
 	 * the position.
-	 * 
+	 *
 	 * @param position
 	 *            the initial position. The length of the array determines the
 	 *            dimensionality of the space.
@@ -82,7 +82,7 @@ public class Point extends AbstractLocalizable implements Positionable
 	/**
 	 * Create a point at a definite location in a space of the dimensionality of
 	 * the position.
-	 * 
+	 *
 	 * @param position
 	 *            the initial position. The length of the array determines the
 	 *            dimensionality of the space.
@@ -96,7 +96,7 @@ public class Point extends AbstractLocalizable implements Positionable
 	/**
 	 * Create a point using the position and dimensionality of a
 	 * {@link Localizable}
-	 * 
+	 *
 	 * @param localizable
 	 *            the initial position. Its dimensionality determines the
 	 *            dimensionality of the space.
@@ -155,7 +155,8 @@ public class Point extends AbstractLocalizable implements Positionable
 	@Override
 	public void setPosition( final Localizable localizable )
 	{
-		localizable.localize( position );
+		for ( int d = 0; d < n; d++ )
+			position[ d ] = localizable.getLongPosition( d );
 	}
 
 	@Override
@@ -200,7 +201,7 @@ public class Point extends AbstractLocalizable implements Positionable
 	}
 
 	@Override
-	public boolean equals( Object obj )
+	public boolean equals( final Object obj )
 	{
 		if ( obj instanceof RealLocalizable && ( ( RealLocalizable ) obj ).numDimensions() == numDimensions() )
 		{
@@ -220,7 +221,7 @@ public class Point extends AbstractLocalizable implements Positionable
 	/**
 	 * Create a point that stores its coordinates in the provided position
 	 * array.
-	 * 
+	 *
 	 * @param position
 	 *            array to use for storing the position.
 	 */

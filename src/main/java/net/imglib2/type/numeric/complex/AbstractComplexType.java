@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -35,6 +35,8 @@
 package net.imglib2.type.numeric.complex;
 
 import net.imglib2.type.numeric.ComplexType;
+import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.util.Util;
 
 /**
  * TODO
@@ -169,23 +171,28 @@ public abstract class AbstractComplexType< T extends AbstractComplexType< T >> i
 	}
 
 	@Override
-	public boolean equals( final Object o )
+	public boolean valueEquals( T other )
 	{
-		if ( !getClass().isInstance(o) )
+		return DoubleType.equals( getRealDouble(), other.getRealDouble() ) &&
+				DoubleType.equals( getImaginaryDouble(), other.getImaginaryDouble() );
+	}
+
+	@Override
+	public boolean equals( final Object obj )
+	{
+		if ( !getClass().isInstance(obj) )
 			return false;
 		@SuppressWarnings("unchecked")
-		final T t = (T) o;
-		return getRealDouble() == t.getRealDouble() &&
-			getImaginaryDouble() == t .getImaginaryDouble();
+		final T t = (T) obj;
+		return AbstractComplexType.this.valueEquals( t );
 	}
 
 	@Override
 	public int hashCode()
 	{
-		// NB: Compute similar hash code to java.lang.Double#hashCode().
-		final long rBits = Double.doubleToLongBits(getRealDouble());
-		final long iBits = Double.doubleToLongBits(getImaginaryDouble());
-		return (int) (rBits ^ (rBits >>> 32) ^ iBits ^ (iBits >>> 32));
+		final int rHash = Double.hashCode( getRealDouble() );
+		final int iHash = Double.hashCode( getImaginaryDouble() );
+		return Util.combineHash( rHash, iHash );
 	}
 
 	@Override

@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -34,8 +34,13 @@
 
 package net.imglib2.util;
 
+import static net.imglib2.util.Util.percentile;
+import static net.imglib2.util.Util.quicksort;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -52,6 +57,35 @@ import org.junit.Test;
  */
 public class ImgUtilTest
 {
+	
+	@Test
+	public void testPercentile()
+	{
+		final double[] data = new double[42];
+		for(int i = 0; i < data.length; i++) {
+		    data[i] = Math.random()*42;
+		}
+		final double[] sortedData = data.clone();
+		final double[] quicksortedData = data.clone();
+		Arrays.sort( sortedData );
+		quicksort( quicksortedData );
+		
+		for(int i = 0; i < 3; i++){
+		
+			double percentile = Math.random();
+			
+			int pos = Math.min( data.length - 1,
+								Math.max( 0, ( int ) Math.round( ( data.length - 1 ) * percentile ) ) );
+			
+			final double percentileRes = percentile( data, percentile );
+			
+			assertEquals(quicksortedData[pos], sortedData[pos], 0.001);
+			assertEquals(quicksortedData[pos], percentileRes, 0.001);
+			
+		}
+		
+		
+	}
 
 	@Test
 	public void testCopyDoubleArrayIntIntArrayImgOfT()
@@ -75,7 +109,7 @@ public class ImgUtilTest
 		} };
 		for ( int i = 0; i < offsets.length; i++ )
 		{
-			final Img< DoubleType > img = new ArrayImgFactory< DoubleType >().create( new long[] { 3, 3 }, new DoubleType() );
+			final Img< DoubleType > img = new ArrayImgFactory<>( new DoubleType() ).create( 3, 3 );
 			ImgUtil.copy( input, offsets[ i ], strides[ i ], img );
 			final RandomAccess< DoubleType > ra = img.randomAccess();
 			final long[] location = new long[ 2 ];
@@ -114,7 +148,7 @@ public class ImgUtilTest
 		} };
 		for ( int i = 0; i < offsets.length; i++ )
 		{
-			final Img< FloatType > img = new ArrayImgFactory< FloatType >().create( new long[] { 3, 3 }, new FloatType() );
+			final Img< FloatType > img = new ArrayImgFactory<>( new FloatType() ).create( 3, 3 );
 			ImgUtil.copy( input, offsets[ i ], strides[ i ], img );
 			final RandomAccess< FloatType > ra = img.randomAccess();
 			final long[] location = new long[ 2 ];
@@ -153,7 +187,7 @@ public class ImgUtilTest
 		} };
 		for ( int i = 0; i < offsets.length; i++ )
 		{
-			final Img< LongType > img = new ArrayImgFactory< LongType >().create( new long[] { 3, 3 }, new LongType() );
+			final Img< LongType > img = new ArrayImgFactory<>( new LongType() ).create( 3, 3 );
 			ImgUtil.copy( input, offsets[ i ], strides[ i ], img );
 			final RandomAccess< LongType > ra = img.randomAccess();
 			final long[] location = new long[ 2 ];
@@ -192,7 +226,7 @@ public class ImgUtilTest
 		} };
 		for ( int i = 0; i < offsets.length; i++ )
 		{
-			final Img< IntType > img = new ArrayImgFactory< IntType >().create( new long[] { 3, 3 }, new IntType() );
+			final Img< IntType > img = new ArrayImgFactory<>( new IntType() ).create( 3, 3 );
 			ImgUtil.copy( input, offsets[ i ], strides[ i ], img );
 			final RandomAccess< IntType > ra = img.randomAccess();
 			final long[] location = new long[ 2 ];
@@ -220,7 +254,7 @@ public class ImgUtilTest
 				{ 0, 3, 6, 1, 4, 7, 2, 5, 8 },
 				{ 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
 		final double[] output = new double[ 9 ];
-		final Img< DoubleType > img = new ArrayImgFactory< DoubleType >().create( new long[] { 3, 3 }, new DoubleType() );
+		final Img< DoubleType > img = new ArrayImgFactory<>( new DoubleType() ).create( 3, 3 );
 		final RandomAccess< DoubleType > ra = img.randomAccess();
 		final long[] location = new long[ 2 ];
 		for ( int x = 0; x < 3; x++ )
@@ -251,7 +285,7 @@ public class ImgUtilTest
 				{ 0, 3, 6, 1, 4, 7, 2, 5, 8 },
 				{ 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
 		final float[] output = new float[ 9 ];
-		final Img< FloatType > img = new ArrayImgFactory< FloatType >().create( new long[] { 3, 3 }, new FloatType() );
+		final Img< FloatType > img = new ArrayImgFactory<>( new FloatType() ).create( 3, 3 );
 		final RandomAccess< FloatType > ra = img.randomAccess();
 		final long[] location = new long[ 2 ];
 		for ( int x = 0; x < 3; x++ )
@@ -282,7 +316,7 @@ public class ImgUtilTest
 				{ 0, 3, 6, 1, 4, 7, 2, 5, 8 },
 				{ 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
 		final long[] output = new long[ 9 ];
-		final Img< LongType > img = new ArrayImgFactory< LongType >().create( new long[] { 3, 3 }, new LongType() );
+		final Img< LongType > img = new ArrayImgFactory<>( new LongType() ).create( 3, 3 );
 		final RandomAccess< LongType > ra = img.randomAccess();
 		final long[] location = new long[ 2 ];
 		for ( int x = 0; x < 3; x++ )
@@ -313,7 +347,7 @@ public class ImgUtilTest
 				{ 0, 3, 6, 1, 4, 7, 2, 5, 8 },
 				{ 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
 		final int[] output = new int[ 9 ];
-		final Img< LongType > img = new ArrayImgFactory< LongType >().create( new long[] { 3, 3 }, new LongType() );
+		final Img< LongType > img = new ArrayImgFactory<>( new LongType() ).create( 3, 3 );
 		final RandomAccess< LongType > ra = img.randomAccess();
 		final long[] location = new long[ 2 ];
 		for ( int x = 0; x < 3; x++ )

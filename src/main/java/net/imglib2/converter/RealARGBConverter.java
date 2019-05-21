@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -39,11 +39,15 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 
 /**
- * 
+ *
  * @author Stephan Saalfeld
+ * @author Philipp Hanslovsky
  */
 public class RealARGBConverter< R extends RealType< ? > > extends AbstractLinearRange implements Converter< R, ARGBType >
 {
+
+	private int alpha = 0xff000000;
+
 	public RealARGBConverter()
 	{
 		super();
@@ -58,8 +62,18 @@ public class RealARGBConverter< R extends RealType< ? > > extends AbstractLinear
 	public void convert( final R input, final ARGBType output )
 	{
 		final double a = input.getRealDouble();
-		final int b = Math.min( 255, roundPositive( Math.max( 0, ( ( a - min ) / scale * 255.0 ) ) ) );
-		final int argb = 0xff000000 | ( ( ( b << 8 ) | b ) << 8 ) | b;
+		final int b = Math.min( 255, roundPositive( Math.max( 0, ( a - min ) / scale * 255.0 ) ) );
+		final int argb = this.alpha | ( b << 8 | b ) << 8 | b;
 		output.set( argb );
+	}
+
+	public void setAlpha( final int alpha )
+	{
+		this.alpha = ( alpha & 0xff ) << 24;
+	}
+
+	public int getAlpha()
+	{
+		return this.alpha >>> 24;
 	}
 }

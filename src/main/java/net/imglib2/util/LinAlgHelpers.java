@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -106,6 +106,22 @@ public class LinAlgHelpers
 	public static double distance( final double[] a, final double[] b )
 	{
 		return Math.sqrt( squareDistance( a, b ) );
+	}
+
+	/**
+	 * set c = ( 1 - t ) * a + t * b, where a, b are vectors and t is scalar.
+	 * Dimensions of a, b, and c must match. In place interpolation (c==a or
+	 * c==b) is allowed.
+	 */
+	public static void lerp( final double[] a, final double[] b, final double t, final double[] c )
+	{
+		assert rows( a ) == rows( b );
+		assert rows( a ) == rows( c );
+
+		final int rows = rows( a );
+
+		for ( int i = 0; i < rows; ++i )
+			c[ i ] = ( 1.0 - t ) * a[ i ] + t * b[ i ];
 	}
 
 	/**
@@ -898,6 +914,51 @@ public class LinAlgHelpers
 				( m11 * m22 - m12 * m21 ) / det, ( m02 * m21 - m01 * m22 ) / det, ( m01 * m12 - m02 * m11 ) / det,
 				( m12 * m20 - m10 * m22 ) / det, ( m00 * m22 - m02 * m20 ) / det, ( m02 * m10 - m00 * m12 ) / det,
 				( m10 * m21 - m11 * m20 ) / det, ( m01 * m20 - m00 * m21 ) / det, ( m00 * m11 - m01 * m10 ) / det };
+	}
+
+	/**
+	 * Inverts a (invertible) symmetric 3x3 matrix.
+	 *
+	 * @param m
+	 *            symmetric matrix to invert.
+	 * @param inverse
+	 *            inverse of {@code m} is stored here.
+	 */
+	public static void invertSymmetric3x3( final double[][] m, final double[][] inverse )
+	{
+		final double a00 = m[ 2 ][ 2 ] * m[ 1 ][ 1 ] - m[ 1 ][ 2 ] * m[ 1 ][ 2 ];
+		final double a01 = m[ 0 ][ 2 ] * m[ 1 ][ 2 ] - m[ 2 ][ 2 ] * m[ 0 ][ 1 ];
+		final double a02 = m[ 0 ][ 1 ] * m[ 1 ][ 2 ] - m[ 0 ][ 2 ] * m[ 1 ][ 1 ];
+
+		final double a11 = m[ 2 ][ 2 ] * m[ 0 ][ 0 ] - m[ 0 ][ 2 ] * m[ 0 ][ 2 ];
+		final double a12 = m[ 0 ][ 1 ] * m[ 0 ][ 2 ] - m[ 0 ][ 0 ] * m[ 1 ][ 2 ];
+
+		final double a22 = m[ 0 ][ 0 ] * m[ 1 ][ 1 ] - m[ 0 ][ 1 ] * m[ 0 ][ 1 ];
+
+		final double Dinv = 1.0 / ( ( m[ 0 ][ 0 ] * a00 ) + ( m[ 1 ][ 0 ] * a01 ) + ( m[ 0 ][ 2 ] * a02 ) );
+
+		inverse[ 0 ][ 0 ] = a00 * Dinv;
+		inverse[ 1 ][ 0 ] = inverse[ 0 ][ 1 ] = a01 * Dinv;
+		inverse[ 2 ][ 0 ] = inverse[ 0 ][ 2 ] = a02 * Dinv;
+		inverse[ 1 ][ 1 ] = a11 * Dinv;
+		inverse[ 2 ][ 1 ] = inverse[ 1 ][ 2 ] = a12 * Dinv;
+		inverse[ 2 ][ 2 ] = a22 * Dinv;
+	}
+
+	/**
+	 * Inverts a (invertible) symmetric 2x2 matrix.
+	 *
+	 * @param m
+	 *            symmetric matrix to invert.
+	 * @param inverse
+	 *            inverse of {@code m} is stored here.
+	 */
+	public static void invertSymmetric2x2( final double[][] m, final double[][] inverse )
+	{
+		final double Dinv = 1.0 / ( m[ 0 ][ 0 ] * m[ 1 ][ 1 ] - m[ 1 ][ 0 ] * m[ 1 ][ 0 ] );
+		inverse[ 0 ][ 0 ] = m[ 1 ][ 1 ] * Dinv;
+		inverse[ 1 ][ 0 ] = inverse[ 0 ][ 1 ] = -m[ 1 ][ 0 ] * Dinv;
+		inverse[ 1 ][ 1 ] = m[ 0 ][ 0 ] * Dinv;
 	}
 
 	public static String toString( final double[][] A )

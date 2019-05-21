@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -35,15 +35,16 @@
 package net.imglib2.type.numeric.real;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.FloatAccess;
 import net.imglib2.img.basictypeaccess.array.FloatArray;
 import net.imglib2.type.NativeType;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.util.Fraction;
+import net.imglib2.util.Util;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -84,21 +85,6 @@ public class FloatType extends AbstractRealType< FloatType > implements NativeTy
 	}
 
 	@Override
-	public NativeImg< FloatType, ? extends FloatAccess > createSuitableNativeImg( final NativeImgFactory< FloatType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg<FloatType, ? extends FloatAccess> container = storageFactory.createFloatInstance( dim, new Fraction() );
-		
-		// create a Type that is linked to the container
-		final FloatType linkedType = new FloatType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public void updateContainer( final Object c )
 	{
 		dataAccess = img.update( c );
@@ -108,6 +94,14 @@ public class FloatType extends AbstractRealType< FloatType > implements NativeTy
 	public FloatType duplicateTypeOnSameNativeImg()
 	{
 		return new FloatType( img );
+	}
+
+	private static final NativeTypeFactory< FloatType, FloatAccess > typeFactory = NativeTypeFactory.FLOAT( FloatType::new );
+
+	@Override
+	public NativeTypeFactory< FloatType, FloatAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
 	}
 
 	public float get()
@@ -199,26 +193,6 @@ public class FloatType extends AbstractRealType< FloatType > implements NativeTy
 	}
 
 	@Override
-	public int hashCode()
-	{
-		// NB: Use the same hash code as java.lang.Float#hashCode().
-		return Float.floatToIntBits(get());
-	}
-
-	@Override
-	public int compareTo( final FloatType c )
-	{
-		final float a = get();
-		final float b = c.get();
-		if ( a > b )
-			return 1;
-		else if ( a < b )
-			return -1;
-		else
-			return 0;
-	}
-
-	@Override
 	public void set( final FloatType c )
 	{
 		set( c.get() );
@@ -263,8 +237,11 @@ public class FloatType extends AbstractRealType< FloatType > implements NativeTy
 	}
 
 	@Override
-	public Fraction getEntitiesPerPixel() { return new Fraction(); }
-	
+	public Fraction getEntitiesPerPixel()
+	{
+		return new Fraction();
+	}
+
 	@Override
 	public void updateIndex( final int index )
 	{
@@ -308,8 +285,31 @@ public class FloatType extends AbstractRealType< FloatType > implements NativeTy
 	}
 
 	@Override
-	public boolean valueEquals( FloatType t )
+	public int compareTo( final FloatType other )
 	{
-		return get() == t.get();
+		return Float.compare( get(), other.get() );
+	}
+
+	@Override
+	public boolean valueEquals( final FloatType other )
+	{
+		return FloatType.equals( get(), other.get() );
+	}
+
+	@Override
+	public boolean equals( final Object obj )
+	{
+		return Util.valueEqualsObject( this, obj );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Float.hashCode( get() );
+	}
+
+	public static boolean equals( float a, float b )
+	{
+		return Float.floatToIntBits( a ) == Float.floatToIntBits( b );
 	}
 }

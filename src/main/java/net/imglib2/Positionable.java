@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -36,8 +36,7 @@ package net.imglib2;
 
 /**
  * An element that can be positioned in n-dimensional discrete space.
- * 
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  * @author Tobias Pietzsch
@@ -46,7 +45,7 @@ public interface Positionable extends EuclideanSpace
 {
 	/**
 	 * Move by 1 in one dimension.
-	 * 
+	 *
 	 * @param d
 	 *            dimension
 	 */
@@ -54,7 +53,7 @@ public interface Positionable extends EuclideanSpace
 
 	/**
 	 * Move by -1 in one dimension.
-	 * 
+	 *
 	 * @param d
 	 *            dimension
 	 */
@@ -62,7 +61,7 @@ public interface Positionable extends EuclideanSpace
 
 	/**
 	 * Move the element in one dimension for some distance.
-	 * 
+	 *
 	 * @param distance
 	 *            relative offset in dimension d
 	 * @param d
@@ -72,7 +71,7 @@ public interface Positionable extends EuclideanSpace
 
 	/**
 	 * Move the element in one dimension for some distance.
-	 * 
+	 *
 	 * @param distance
 	 *            relative offset in dimension d
 	 * @param d
@@ -83,57 +82,61 @@ public interface Positionable extends EuclideanSpace
 	/**
 	 * Move the element relative to its current location using an
 	 * {@link Localizable} as distance vector.
-	 * 
-	 * @param localizable
-	 *            relative offset
+	 *
+	 * @param distance
+	 *            relative offset, {@link Localizable#numDimensions()} must be
+	 *            &ge; {@link #numDimensions()}
 	 */
-	public void move( Localizable localizable );
+	public void move( Localizable distance );
 
 	/**
 	 * Move the element relative to its current location using an int[] as
 	 * distance vector.
-	 * 
+	 *
 	 * @param distance
-	 *            relative offset
+	 *            relative offset, length must be &ge; {@link #numDimensions()}
 	 */
 	public void move( int[] distance );
 
 	/**
 	 * Move the element relative to its current location using a long[] as
 	 * distance vector.
-	 * 
+	 *
 	 * @param distance
-	 *            relative offset
+	 *            relative offset, length must be &ge; {@link #numDimensions()}
 	 */
 	public void move( long[] distance );
 
 	/**
 	 * Place the element at the same location as a given {@link Localizable}
-	 * 
-	 * @param localizable
-	 *            relative offset
+	 *
+	 * @param position
+	 *            absolute position, {@link Localizable#numDimensions()} must be
+	 *            &ge; {@link #numDimensions()}
 	 */
-	public void setPosition( Localizable localizable );
+	public void setPosition( Localizable position );
 
 	/**
 	 * Set the position of the element.
-	 * 
+	 *
 	 * @param position
-	 *            absolute position
+	 *            absolute position, length must be &ge;
+	 *            {@link #numDimensions()}
 	 */
 	public void setPosition( int[] position );
 
 	/**
 	 * Set the position of the element.
-	 * 
+	 *
 	 * @param position
-	 *            absolute position
+	 *            absolute position, length must be &ge;
+	 *            {@link #numDimensions()}
 	 */
 	public void setPosition( long[] position );
 
 	/**
 	 * Set the position of the element for one dimension.
-	 * 
+	 *
 	 * @param position
 	 *            absolute position in dimension d
 	 * @param d
@@ -143,7 +146,7 @@ public interface Positionable extends EuclideanSpace
 
 	/**
 	 * Set the position of the element for one dimension.
-	 * 
+	 *
 	 * @param position
 	 *            absolute position in dimension d
 	 * @param d

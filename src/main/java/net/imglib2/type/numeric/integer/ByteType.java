@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -37,14 +37,12 @@ package net.imglib2.type.numeric.integer;
 import java.math.BigInteger;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.ByteAccess;
-import net.imglib2.type.numeric.real.DoubleType;
-import net.imglib2.util.Fraction;
+import net.imglib2.type.NativeTypeFactory;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -74,19 +72,12 @@ public class ByteType extends GenericByteType< ByteType >
 		super( ( byte ) 0 );
 	}
 
+	private static final NativeTypeFactory< ByteType, ByteAccess > typeFactory = NativeTypeFactory.BYTE( ByteType::new );
+
 	@Override
-	public NativeImg< ByteType, ? extends ByteAccess > createSuitableNativeImg( final NativeImgFactory< ByteType > storageFactory, final long dim[] )
+	public NativeTypeFactory< ByteType, ByteAccess > getNativeTypeFactory()
 	{
-		// create the container
-		final NativeImg<ByteType, ? extends ByteAccess> container = storageFactory.createByteInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final ByteType linkedType = new ByteType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
+		return typeFactory;
 	}
 
 	@Override
@@ -97,12 +88,12 @@ public class ByteType extends GenericByteType< ByteType >
 
 	public byte get()
 	{
-		return getValue();
+		return getByte();
 	}
 
 	public void set( final byte b )
 	{
-		setValue( b );
+		setByte( b );
 	}
 
 	@Override
@@ -117,7 +108,7 @@ public class ByteType extends GenericByteType< ByteType >
 		return get();
 	}
 
-	@Override 
+	@Override
 	public BigInteger getBigInteger()
 	{
 		return BigInteger.valueOf( get() );
@@ -162,6 +153,6 @@ public class ByteType extends GenericByteType< ByteType >
 	@Override
 	public ByteType copy()
 	{
-		return new ByteType( getValue() );
+		return new ByteType( getByte() );
 	}
 }

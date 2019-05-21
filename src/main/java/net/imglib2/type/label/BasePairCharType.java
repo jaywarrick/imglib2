@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,17 +35,17 @@
 package net.imglib2.type.label;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.CharAccess;
 import net.imglib2.img.basictypeaccess.array.CharArray;
 import net.imglib2.type.AbstractNativeType;
 import net.imglib2.type.BasePairType;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.type.label.BasePairBitType.Base;
 import net.imglib2.util.Fraction;
 
 /**
- * Representation of base pairs using one char per entry, supported characters: gap, N, A, T, G, C, U
- * Bases are handled using the {@link Base} enumeration.
+ * Representation of base pairs using one char per entry, supported characters:
+ * gap, N, A, T, G, C, U Bases are handled using the {@link Base} enumeration.
  *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
@@ -53,7 +53,10 @@ import net.imglib2.util.Fraction;
 public class BasePairCharType extends AbstractNativeType< BasePairCharType > implements BasePairType< BasePairCharType >
 {
 	@Override
-	public Fraction getEntitiesPerPixel() { return new Fraction(); }
+	public Fraction getEntitiesPerPixel()
+	{
+		return new Fraction();
+	}
 
 	final protected NativeImg< ?, ? extends CharAccess > img;
 
@@ -89,21 +92,6 @@ public class BasePairCharType extends AbstractNativeType< BasePairCharType > imp
 	}
 
 	@Override
-	public NativeImg< BasePairCharType, ? extends CharAccess > createSuitableNativeImg( final NativeImgFactory< BasePairCharType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg<BasePairCharType, ? extends CharAccess> container = storageFactory.createCharInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final BasePairCharType linkedType = new BasePairCharType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public void updateContainer( final Object c )
 	{
 		dataAccess = img.update( c );
@@ -113,6 +101,14 @@ public class BasePairCharType extends AbstractNativeType< BasePairCharType > imp
 	public BasePairCharType duplicateTypeOnSameNativeImg()
 	{
 		return new BasePairCharType( img );
+	}
+
+	private static final NativeTypeFactory< BasePairCharType, CharAccess > typeFactory = NativeTypeFactory.CHAR( BasePairCharType::new );
+
+	@Override
+	public NativeTypeFactory< BasePairCharType, CharAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
 	}
 
 	public char getChar()
@@ -128,54 +124,13 @@ public class BasePairCharType extends AbstractNativeType< BasePairCharType > imp
 	@Override
 	public void set( final Base base )
 	{
-		switch ( base )
-		{
-		case A:
-			setChar( 'A' );
-			return;
-		case T:
-			setChar( 'T' );
-			return;
-		case G:
-			setChar( 'G' );
-			return;
-		case C:
-			setChar( 'C' );
-			return;
-		case U:
-			setChar( 'U' );
-			return;
-		case gap:
-			setChar( ' ' );
-			return;
-		default:
-			setChar( 'N' );
-			return;
-		}
+		setChar( base.getChar() );
 	}
 
 	@Override
 	public Base get()
 	{
-		final char value = getChar();
-
-		switch ( value )
-		{
-		case 'A':
-			return Base.A;
-		case 'T':
-			return Base.T;
-		case 'G':
-			return Base.G;
-		case 'C':
-			return Base.C;
-		case 'U':
-			return Base.U;
-		case ' ':
-			return Base.gap;
-		default:
-			return Base.N;
-		}
+		return Base.fromChar( getChar() );
 	}
 
 	@Override
@@ -187,27 +142,7 @@ public class BasePairCharType extends AbstractNativeType< BasePairCharType > imp
 	@Override
 	public int compareTo( final BasePairCharType c )
 	{
-		final char input = getChar();
-		final char compare = c.getChar();
-
-		if ( input == compare ) { return 0; }
-		switch ( input )
-		{
-		case ' ':
-			return -1;
-		case 'N':
-			return compare == ' ' ? 1 : -1;
-		case 'A':
-			return compare == ' ' || compare == 'N' ? 1 : -1;
-		case 'T':
-			return compare == 'G' || compare == 'C' || compare == 'U' ? -1 : 1;
-		case 'G':
-			return compare == 'C' || compare == 'U' ? -1 : 1;
-		case 'C':
-			return compare == 'U' ? -1 : 1;
-		default:
-			return 1;
-		}
+		return get().compareTo( c.get() );
 	}
 
 	@Override
@@ -237,25 +172,7 @@ public class BasePairCharType extends AbstractNativeType< BasePairCharType > imp
 	@Override
 	public byte baseToValue()
 	{
-		final char base = getChar();
-
-		switch ( base )
-		{
-		case 'N':
-			return 1;
-		case 'A':
-			return 2;
-		case 'T':
-			return 3;
-		case 'G':
-			return 4;
-		case 'C':
-			return 5;
-		case 'U':
-			return 6;
-		default:
-			return 0;
-		}
+		return ( byte ) get().ordinal();
 	}
 
 	@Override

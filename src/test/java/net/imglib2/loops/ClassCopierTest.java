@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,40 +31,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+package net.imglib2.loops;
 
-package net.imglib2.img.sparse;
+import static junit.framework.TestCase.assertNotSame;
+import static org.junit.Assert.assertEquals;
 
-import net.imglib2.img.basictypeaccess.IntAccess;
+import org.junit.Test;
 
-// TODO: REMOVE? This seems redundant with IntNTree?
 /**
- * IntAccess based on a {@link Ntree}{@code<Integer>}.
+ * Tests {@link ClassCopier}.
  *
- * @author Tobias Pietzsch
+ * @author Matthias Arzt
  */
-public final class NtreeIntAccess implements IntAccess
+public class ClassCopierTest
 {
-	private final Ntree< Integer > ntree;
 
-	private final long[] position;
-
-	public NtreeIntAccess( final Ntree< Integer > ntree, final long[] position )
+	@Test
+	public void testExecuteCopy()
+			throws IllegalAccessException, InstantiationException
 	{
-		this.ntree = ntree;
-		this.position = position;
+		final ClassCopier< MyInterface > copier = new ClassCopier<>( MyClass.class, MyInterface.class );
+		final MyInterface copy = copier.copy().newInstance();
+		assertEquals( "Hello World!", copy.toString() );
 	}
 
-	@Override
-	public int getValue( final int index )
+	@Test
+	public void testCopy() throws IllegalAccessException, InstantiationException
 	{
-		// ignore index, get tree position from RandomAccess/Cursor
-		return ntree.getNode( position ).getValue();
+		final Class< ? extends MyInterface > originalClass = MyClass.class;
+		final ClassCopier< MyInterface > copier = new ClassCopier<>( originalClass, MyInterface.class );
+		final Class< ? extends MyInterface > copiedClass = copier.copy();
+		assertNotSame( originalClass, copiedClass );
 	}
 
-	@Override
-	public void setValue( final int index, final int value )
+	@Test( expected = IllegalArgumentException.class )
+	public void testCopyRequiresInterface()
+			throws IllegalAccessException, InstantiationException
 	{
-		// ignore index, get tree position from RandomAccess/Cursor
-		ntree.createNodeWithValue( position, value );
+		// NB: An instance of a copy of MyClass, cannot be assigned to MyClass.
+		final MyClass copy = new ClassCopier<>( MyClass.class, MyClass.class ).copy().newInstance();
+	}
+
+	public static class MyClass implements MyInterface
+	{
+
+		@Override
+		public String toString()
+		{
+			return "Hello World!";
+		}
+	}
+
+	public interface MyInterface
+	{
+
 	}
 }

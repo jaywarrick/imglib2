@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +48,7 @@ import net.imglib2.util.Util;
  *
  * @author Albert Cardona
  */
-public abstract class AbstractIntegerBitType<T extends AbstractIntegerBitType<T>> extends AbstractBitType<T> implements IntegerType<T>
+public abstract class AbstractIntegerBitType< T extends AbstractIntegerBitType< T > > extends AbstractBitType< T > implements IntegerType< T >
 {
 	// Maximum count is Integer.MAX_VALUE * (64 / getBitsPerPixel())
 	//protected long i = 0;
@@ -95,35 +95,6 @@ public abstract class AbstractIntegerBitType<T extends AbstractIntegerBitType<T>
 	public void setZero() { setInteger( 0 ); }
 	@Override
 	public void setOne() { setInteger( 1 ); }
-
-	@Override
-	public boolean equals( final Object o ) {
-		if ( !getClass().isInstance(o) )
-			return false;
-		@SuppressWarnings("unchecked")
-		final T t = (T) o;
-		return compareTo(t) == 0;
-	}
-
-	@Override
-	public int hashCode() {
-		// NB: Use the same hash code as java.lang.Long#hashCode().
-		final long value = get();
-		return (int) (value ^ (value >>> 32));
-	}
-
-	@Override
-	public int compareTo( final T c )
-	{
-		final long a = getIntegerLong();
-		final long b = c.getIntegerLong();
-		if ( a > b )
-			return 1;
-		else if ( a < b )
-			return -1;
-		else
-			return 0;
-	}
 
 	@Override
 	public String toString() { return "" + getIntegerLong(); }
@@ -201,6 +172,12 @@ public abstract class AbstractIntegerBitType<T extends AbstractIntegerBitType<T>
 	@Override
 	public void complexConjugate(){}
 
+	@Override
+	public int compareTo( final T other )
+	{
+		return Long.compare( getIntegerLong(), other.getIntegerLong() );
+	}
+
 	/**
 	 * Default test at long precision.  Please override for types longer than 64bit.
 	 *
@@ -211,5 +188,21 @@ public abstract class AbstractIntegerBitType<T extends AbstractIntegerBitType<T>
 	public boolean valueEquals( final T t )
 	{
 		return get() == t.get();
+	}
+
+	@Override
+	public boolean equals( final Object obj )
+	{
+		if ( !getClass().isInstance( obj ) )
+			return false;
+		@SuppressWarnings( "unchecked" )
+		final T t = ( T ) obj;
+		return AbstractIntegerBitType.this.valueEquals( t );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Long.hashCode( get() );
 	}
 }

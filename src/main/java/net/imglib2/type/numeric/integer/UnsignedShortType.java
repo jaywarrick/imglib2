@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -37,14 +37,13 @@ package net.imglib2.type.numeric.integer;
 import java.math.BigInteger;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.ShortAccess;
-import net.imglib2.util.Fraction;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.util.Util;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -95,24 +94,17 @@ public class UnsignedShortType extends GenericShortType< UnsignedShortType >
 	}
 
 	@Override
-	public NativeImg< UnsignedShortType, ? extends ShortAccess > createSuitableNativeImg( final NativeImgFactory< UnsignedShortType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg<UnsignedShortType, ? extends ShortAccess> container = storageFactory.createShortInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final UnsignedShortType linkedType = new UnsignedShortType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public UnsignedShortType duplicateTypeOnSameNativeImg()
 	{
 		return new UnsignedShortType( img );
+	}
+
+	private static final NativeTypeFactory< UnsignedShortType, ShortAccess > typeFactory = NativeTypeFactory.SHORT( UnsignedShortType::new );
+
+	@Override
+	public NativeTypeFactory< UnsignedShortType, ShortAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
 	}
 
 	@Override
@@ -165,12 +157,12 @@ public class UnsignedShortType extends GenericShortType< UnsignedShortType >
 
 	public int get()
 	{
-		return getUnsignedShort( getValue() );
+		return getUnsignedShort( getShort() );
 	}
 
 	public void set( final int f )
 	{
-		setValue( getCodedSignedShort( f ) );
+		setShort( getCodedSignedShort( f ) );
 	}
 
 	@Override
@@ -204,7 +196,7 @@ public class UnsignedShortType extends GenericShortType< UnsignedShortType >
 	}
 
 	@Override
-	public void setBigInteger(BigInteger b)
+	public void setBigInteger( final BigInteger b )
 	{
 		set( b.intValue() );
 	}
@@ -219,27 +211,6 @@ public class UnsignedShortType extends GenericShortType< UnsignedShortType >
 	public double getMinValue()
 	{
 		return 0;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		// NB: Use the same hash code as java.lang.Integer#hashCode().
-		return get();
-	}
-
-	@Override
-	public int compareTo( final UnsignedShortType c )
-	{
-		final int a = get();
-		final int b = c.get();
-
-		if ( a > b )
-			return 1;
-		else if ( a < b )
-			return -1;
-		else
-			return 0;
 	}
 
 	@Override
@@ -258,5 +229,11 @@ public class UnsignedShortType extends GenericShortType< UnsignedShortType >
 	public String toString()
 	{
 		return "" + get();
+	}
+
+	@Override
+	public int compareTo( final UnsignedShortType other )
+	{
+		return Integer.compare( get(), other.get() );
 	}
 }

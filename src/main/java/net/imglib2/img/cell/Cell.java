@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,6 +34,9 @@
 
 package net.imglib2.img.cell;
 
+import java.io.Serializable;
+
+import net.imglib2.Interval;
 import net.imglib2.util.IntervalIndexer;
 import net.imglib2.util.Intervals;
 
@@ -42,8 +45,10 @@ import net.imglib2.util.Intervals;
  *
  * @author Tobias Pietzsch
  */
-public class Cell< A >
+public class Cell< A > implements Interval, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	protected final int n;
 
 	protected final int[] dimensions;
@@ -115,26 +120,36 @@ public class Cell< A >
 		return IntervalIndexer.positionWithOffsetToIndex( position, dimensions, min );
 	}
 
+	@Override
+	public int numDimensions()
+	{
+		return n;
+	}
+
 	/**
+	 * Get the minimum in dimension d.
 	 *
 	 * @param d
 	 *            dimension
-	 * @return minimum
+	 * @return minimum in dimension d.
 	 */
+	@Override
 	public long min( final int d )
 	{
 		return min[ d ];
 	}
 
 	/**
-	 * Write the minimum of each dimension into long[].
+	 * Get the maximum in dimension d.
 	 *
-	 * @param minimum
+	 * @param d
+	 *            dimension
+	 * @return maximum in dimension d.
 	 */
-	public void min( final long[] minimum )
+	@Override
+	public long max( final int d )
 	{
-		for ( int d = 0; d < n; ++d )
-			minimum[ d ] = min[ d ];
+		return max[ d ];
 	}
 
 	/**
@@ -142,13 +157,14 @@ public class Cell< A >
 	 *
 	 * @param d
 	 */
-	public int dimension( final int d )
+	@Override
+	public long dimension( final int d )
 	{
 		return dimensions[ d ];
 	}
 
 	/**
-	 * Write the number of pixels in each dimension into long[].
+	 * Write the number of pixels in each dimension into int[].
 	 *
 	 * @param dim
 	 */

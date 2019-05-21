@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -36,7 +36,7 @@ package net.imglib2;
 
 /**
  * A point is a location in EuclideanSpace.
- * 
+ *
  * @author Lee Kamentsky
  * @author Stephan Saalfeld
  * @author Tobias Pietzsch
@@ -45,7 +45,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 {
 	/**
 	 * Protected constructor that can re-use the passed position array.
-	 * 
+	 *
 	 * @param position
 	 *            array used to store the position.
 	 * @param copy
@@ -58,7 +58,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 
 	/**
 	 * Create a point in <i>nDimensional</i> space initialized to 0,0,...
-	 * 
+	 *
 	 * @param n
 	 *            number of dimensions of the space
 	 */
@@ -70,7 +70,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	/**
 	 * Create a point at a definite location in a space of the dimensionality of
 	 * the position.
-	 * 
+	 *
 	 * @param position
 	 *            the initial position. The length of the array determines the
 	 *            dimensionality of the space.
@@ -83,7 +83,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	/**
 	 * Create a point at a definite location in a space of the dimensionality of
 	 * the position.
-	 * 
+	 *
 	 * @param position
 	 *            the initial position. The length of the array determines the
 	 *            dimensionality of the space.
@@ -97,7 +97,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	/**
 	 * Create a point using the position and dimensionality of a
 	 * {@link RealLocalizable}
-	 * 
+	 *
 	 * @param localizable
 	 *            the initial position. Its dimensionality determines the
 	 *            dimensionality of the space.
@@ -156,7 +156,8 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	@Override
 	public void setPosition( final Localizable localizable )
 	{
-		localizable.localize( position );
+		for ( int d = 0; d < n; d++ )
+			position[ d ] = localizable.getDoublePosition( d );
 	}
 
 	@Override
@@ -221,7 +222,8 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	@Override
 	public void setPosition( final RealLocalizable localizable )
 	{
-		localizable.localize( position );
+		for ( int d = 0; d < n; d++ )
+			position[ d ] = localizable.getDoublePosition( d );
 	}
 
 	@Override
@@ -268,7 +270,7 @@ public class RealPoint extends AbstractRealLocalizable implements RealPositionab
 	/**
 	 * Create a point that stores its coordinates in the provided position
 	 * array.
-	 * 
+	 *
 	 * @param position
 	 *            array to use for storing the position.
 	 */

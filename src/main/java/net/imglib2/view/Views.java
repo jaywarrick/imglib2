@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -11,13 +11,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,6 +34,7 @@
 
 package net.imglib2.view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -57,13 +58,15 @@ import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
 import net.imglib2.outofbounds.OutOfBoundsPeriodicFactory;
 import net.imglib2.outofbounds.OutOfBoundsRandomValueFactory;
 import net.imglib2.transform.integer.BoundingBox;
-import net.imglib2.transform.integer.MixedTransform;
+import net.imglib2.transform.integer.Mixed;
 import net.imglib2.transform.integer.permutation.AbstractPermutationTransform;
 import net.imglib2.transform.integer.permutation.PermutationTransform;
 import net.imglib2.transform.integer.permutation.SingleDimensionPermutationTransform;
 import net.imglib2.transform.integer.shear.InverseShearTransform;
 import net.imglib2.transform.integer.shear.ShearTransform;
+import net.imglib2.type.BooleanType;
 import net.imglib2.type.Type;
+import net.imglib2.type.numeric.IntegerType;
 import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
@@ -104,7 +107,7 @@ public class Views
 	 */
 	public static < T, F extends EuclideanSpace > RealRandomAccessible< T > interpolate( final F source, final InterpolatorFactory< T, F > factory )
 	{
-		return new Interpolant< T, F >( source, factory );
+		return new Interpolant<>( source, factory );
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class Views
 	 */
 	public static < T > RandomAccessibleOnRealRandomAccessible< T > raster( final RealRandomAccessible< T > source )
 	{
-		return new RandomAccessibleOnRealRandomAccessible< T >( source );
+		return new RandomAccessibleOnRealRandomAccessible<>( source );
 	}
 
 	/**
@@ -135,7 +138,7 @@ public class Views
 	 */
 	public static < T, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extend( final F source, final OutOfBoundsFactory< T, ? super F > factory )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, factory );
+		return new ExtendedRandomAccessibleInterval<>( source, factory );
 	}
 
 	/**
@@ -151,7 +154,7 @@ public class Views
 	 */
 	public static < T, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendMirrorSingle( final F source )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsMirrorFactory< T, F >( OutOfBoundsMirrorFactory.Boundary.SINGLE ) );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsMirrorFactory<>( OutOfBoundsMirrorFactory.Boundary.SINGLE ) );
 	}
 
 	/**
@@ -166,7 +169,7 @@ public class Views
 	 */
 	public static < T, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendMirrorDouble( final F source )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsMirrorFactory< T, F >( OutOfBoundsMirrorFactory.Boundary.DOUBLE ) );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsMirrorFactory<>( OutOfBoundsMirrorFactory.Boundary.DOUBLE ) );
 	}
 
 	/**
@@ -181,7 +184,102 @@ public class Views
 	 */
 	public static < T extends Type< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final T value )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsConstantValueFactory< T, F >( value ) );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsConstantValueFactory<>( value ) );
+	}
+
+	/**
+	 * Extend a RandomAccessibleInterval with a constant-value out-of-bounds
+	 * strategy.
+	 *
+	 * @param source
+	 *            the interval to extend.
+	 * @param value
+	 *            the extension value
+	 * @return (unbounded) RandomAccessible which extends the input interval to
+	 *         infinity.
+	 * @see net.imglib2.outofbounds.OutOfBoundsConstantValue
+	 */
+	public static < T extends RealType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final float value )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setReal( value );
+		return Views.extendValue( source, extension );
+	}
+
+	/**
+	 * Extend a RandomAccessibleInterval with a constant-value out-of-bounds
+	 * strategy.
+	 *
+	 * @param source
+	 *            the interval to extend.
+	 * @param value
+	 *            the extension value
+	 * @return (unbounded) RandomAccessible which extends the input interval to
+	 *         infinity.
+	 * @see net.imglib2.outofbounds.OutOfBoundsConstantValue
+	 */
+	public static < T extends RealType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final double value )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setReal( value );
+		return Views.extendValue( source, extension );
+	}
+
+	/**
+	 * Extend a RandomAccessibleInterval with a constant-value out-of-bounds
+	 * strategy.
+	 *
+	 * @param source
+	 *            the interval to extend.
+	 * @param value
+	 *            the extension value
+	 * @return (unbounded) RandomAccessible which extends the input interval to
+	 *         infinity.
+	 * @see net.imglib2.outofbounds.OutOfBoundsConstantValue
+	 */
+	public static < T extends IntegerType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final int value )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setInteger( value );
+		return Views.extendValue( source, extension );
+	}
+
+	/**
+	 * Extend a RandomAccessibleInterval with a constant-value out-of-bounds
+	 * strategy.
+	 *
+	 * @param source
+	 *            the interval to extend.
+	 * @param value
+	 *            the extension value
+	 * @return (unbounded) RandomAccessible which extends the input interval to
+	 *         infinity.
+	 * @see net.imglib2.outofbounds.OutOfBoundsConstantValue
+	 */
+	public static < T extends IntegerType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final long value )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setInteger( value );
+		return Views.extendValue( source, extension );
+	}
+
+	/**
+	 * Extend a RandomAccessibleInterval with a constant-value out-of-bounds
+	 * strategy.
+	 *
+	 * @param source
+	 *            the interval to extend.
+	 * @param value
+	 *            the extension value
+	 * @return (unbounded) RandomAccessible which extends the input interval to
+	 *         infinity.
+	 * @see net.imglib2.outofbounds.OutOfBoundsConstantValue
+	 */
+	public static < T extends BooleanType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendValue( final F source, final boolean value )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.set( value );
+		return Views.extendValue( source, extension );
 	}
 
 	/**
@@ -198,7 +296,7 @@ public class Views
 	{
 		final T zero = Util.getTypeFromInterval( source ).createVariable();
 		zero.setZero();
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsConstantValueFactory< T, F >( zero ) );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsConstantValueFactory<>( zero ) );
 	}
 
 	/**
@@ -217,7 +315,7 @@ public class Views
 	 */
 	public static < T extends RealType< T >, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendRandom( final F source, final double min, final double max )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsRandomValueFactory< T, F >( Util.getTypeFromInterval( source ), min, max ) );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsRandomValueFactory<>( Util.getTypeFromInterval( source ), min, max ) );
 	}
 
 	/**
@@ -231,7 +329,7 @@ public class Views
 	 */
 	public static < T, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendPeriodic( final F source )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsPeriodicFactory< T, F >() );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsPeriodicFactory<>() );
 	}
 
 	/**
@@ -246,7 +344,7 @@ public class Views
 	 */
 	public static < T, F extends RandomAccessibleInterval< T > > ExtendedRandomAccessibleInterval< T, F > extendBorder( final F source )
 	{
-		return new ExtendedRandomAccessibleInterval< T, F >( source, new OutOfBoundsBorderFactory< T, F >() );
+		return new ExtendedRandomAccessibleInterval<>( source, new OutOfBoundsBorderFactory<>() );
 	}
 
 	/**
@@ -264,7 +362,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > interval( final RandomAccessible< T > randomAccessible, final long[] min, final long[] max )
 	{
-		return new IntervalView< T >( randomAccessible, min, max );
+		return new IntervalView<>( randomAccessible, min, max );
 	}
 
 	/**
@@ -280,7 +378,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > interval( final RandomAccessible< T > randomAccessible, final Interval interval )
 	{
-		return new IntervalView< T >( randomAccessible, interval );
+		return new IntervalView<>( randomAccessible, interval );
 	}
 
 	/**
@@ -297,31 +395,7 @@ public class Views
 	public static < T > MixedTransformView< T > rotate( final RandomAccessible< T > randomAccessible, final int fromAxis, final int toAxis )
 	{
 		final int n = randomAccessible.numDimensions();
-		final MixedTransform t = new MixedTransform( n, n );
-		if ( fromAxis != toAxis )
-		{
-			final int[] component = new int[ n ];
-			final boolean[] inv = new boolean[ n ];
-			for ( int e = 0; e < n; ++e )
-			{
-				if ( e == toAxis )
-				{
-					component[ e ] = fromAxis;
-					inv[ e ] = true;
-				}
-				else if ( e == fromAxis )
-				{
-					component[ e ] = toAxis;
-				}
-				else
-				{
-					component[ e ] = e;
-				}
-			}
-			t.setComponentMapping( component );
-			t.setComponentInversion( inv );
-		}
-		return new MixedTransformView< T >( randomAccessible, t );
+		return new MixedTransformView<>( randomAccessible, ViewTransforms.rotate( n, fromAxis, toAxis ) );
 	}
 
 	/**
@@ -337,21 +411,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > rotate( final RandomAccessibleInterval< T > interval, final int fromAxis, final int toAxis )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( min );
-		interval.max( max );
-		if ( fromAxis != toAxis )
-		{
-			final long fromMinNew = -max[ toAxis ];
-			final long fromMaxNew = -min[ toAxis ];
-			min[ toAxis ] = min[ fromAxis ];
-			max[ toAxis ] = max[ fromAxis ];
-			min[ fromAxis ] = fromMinNew;
-			max[ fromAxis ] = fromMaxNew;
-		}
-		return Views.interval( Views.rotate( ( RandomAccessible< T > ) interval, fromAxis, toAxis ), min, max );
+		return Views.interval( Views.rotate( ( RandomAccessible< T > ) interval, fromAxis, toAxis ), Intervals.rotate( interval, fromAxis, toAxis ) );
 	}
 
 	/**
@@ -364,14 +424,7 @@ public class Views
 	public static < T > MixedTransformView< T > permute( final RandomAccessible< T > randomAccessible, final int fromAxis, final int toAxis )
 	{
 		final int n = randomAccessible.numDimensions();
-		final int[] component = new int[ n ];
-		for ( int e = 0; e < n; ++e )
-			component[ e ] = e;
-		component[ fromAxis ] = toAxis;
-		component[ toAxis ] = fromAxis;
-		final MixedTransform t = new MixedTransform( n, n );
-		t.setComponentMapping( component );
-		return new MixedTransformView< T >( randomAccessible, t );
+		return new MixedTransformView<>( randomAccessible, ViewTransforms.permute( n, fromAxis, toAxis ) );
 	}
 
 	/**
@@ -383,18 +436,33 @@ public class Views
 	 */
 	public static < T > IntervalView< T > permute( final RandomAccessibleInterval< T > interval, final int fromAxis, final int toAxis )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( min );
-		interval.max( max );
-		final long fromMinNew = min[ toAxis ];
-		final long fromMaxNew = max[ toAxis ];
-		min[ toAxis ] = min[ fromAxis ];
-		max[ toAxis ] = max[ fromAxis ];
-		min[ fromAxis ] = fromMinNew;
-		max[ fromAxis ] = fromMaxNew;
-		return Views.interval( Views.permute( ( RandomAccessible< T > ) interval, fromAxis, toAxis ), min, max );
+		return Views.interval( Views.permute( ( RandomAccessible< T > ) interval, fromAxis, toAxis ), Intervals.permuteAxes( interval, fromAxis, toAxis ) );
+	}
+
+	/**
+	 * Create view with permuted axes. fromAxis is moved to toAxis. While the
+	 * order of the other axes is preserved.
+	 *
+	 * If fromAxis=2 and toAxis=4, and axis order of image is XYCZT, then a view
+	 * to the image with axis order XYZTC would be created.
+	 */
+	public static < T > RandomAccessible< T > moveAxis( final RandomAccessible< T > image, final int fromAxis, final int toAxis )
+	{
+		return new MixedTransformView<>( image, ViewTransforms.moveAxis( image.numDimensions(), fromAxis, toAxis ) );
+	}
+
+	/**
+	 * Create view with permuted axes. fromAxis is moved to toAxis. While the
+	 * order of the other axes is preserved.
+	 *
+	 * If fromAxis=2 and toAxis=4, and axis order of image is XYCZT, then a view
+	 * to the image with axis order XYZTC would be created.
+	 */
+	public static < T > RandomAccessibleInterval< T > moveAxis( final RandomAccessibleInterval< T > image, final int fromAxis, final int toAxis )
+	{
+		final int n = image.numDimensions();
+		final Mixed t = ViewTransforms.moveAxis( n, fromAxis, toAxis );
+		return Views.interval( new MixedTransformView<>( image, t ), Intervals.moveAxis( image, fromAxis, toAxis ) );
 	}
 
 	/**
@@ -411,10 +479,8 @@ public class Views
 	 */
 	public static < T > MixedTransformView< T > translate( final RandomAccessible< T > randomAccessible, final long... translation )
 	{
-		final int n = randomAccessible.numDimensions();
-		final MixedTransform t = new MixedTransform( n, n );
-		t.setInverseTranslation( translation );
-		return new MixedTransformView< T >( randomAccessible, t );
+		final Mixed t = ViewTransforms.translate( translation );
+		return new MixedTransformView<>( randomAccessible, t );
 	}
 
 	/**
@@ -431,22 +497,61 @@ public class Views
 	 */
 	public static < T > IntervalView< T > translate( final RandomAccessibleInterval< T > interval, final long... translation )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( min );
-		interval.max( max );
-		for ( int d = 0; d < n; ++d )
-		{
-			min[ d ] += translation[ d ];
-			max[ d ] += translation[ d ];
-		}
-		return Views.interval( Views.translate( ( RandomAccessible< T > ) interval, translation ), min, max );
+		return Views.interval(
+				Views.translate( ( RandomAccessible< T > ) interval, translation ),
+				Intervals.translate( interval, translation ) );
+	}
+
+	/**
+	 * Translate the source view by the given inverse translation vector. Pixel
+	 * <em>x</em> in the source view has coordinates <em>(x - translation)</em>
+	 * in the resulting view.
+	 * <p>
+	 * The effect is that the pixel at {@code translation} in
+	 * {@code randomAccessible} is at the origin in the resulting view.
+	 *
+	 * @param randomAccessible
+	 *            the source
+	 * @param translation
+	 *            inverse translation vector of the source view. The pixel at
+	 *            <em>x</em> in the source view becomes <em>(x -
+	 *            translation)</em> in the resulting view.
+	 */
+	public static < T > MixedTransformView< T > translateInverse( final RandomAccessible< T > randomAccessible, final long... translation )
+	{
+		final Mixed t = ViewTransforms.translateInverse( translation );
+		return new MixedTransformView<>( randomAccessible, t );
+	}
+
+	/**
+	 * Translate the source view by the given inverse translation vector. Pixel
+	 * <em>x</em> in the source view has coordinates <em>(x - translation)</em>
+	 * in the resulting view.
+	 * <p>
+	 * The effect is that the pixel at {@code translation} in {@code interval}
+	 * is at the origin in the resulting view.
+	 *
+	 * @param interval
+	 *            the source
+	 * @param translation
+	 *            inverse translation vector of the source view. The pixel at
+	 *            <em>x</em> in the source view becomes <em>(x -
+	 *            translation)</em> in the resulting view.
+	 */
+	public static < T > IntervalView< T > translateInverse( final RandomAccessibleInterval< T > interval, final long... translation )
+	{
+		return Views.interval(
+				Views.translateInverse( ( RandomAccessible< T > ) interval, translation ),
+				Intervals.translateInverse( interval, translation ) );
 	}
 
 	/**
 	 * Translate such that pixel at offset in randomAccessible is at the origin
 	 * in the resulting view. This is equivalent to translating by -offset.
+	 *
+	 * @deprecated Please use
+	 *             {@link Views#translateInverse(RandomAccessible, long...)}
+	 *             instead.
 	 *
 	 * @param randomAccessible
 	 *            the source
@@ -454,17 +559,19 @@ public class Views
 	 *            offset of the source view. The pixel at offset becomes the
 	 *            origin of resulting view.
 	 */
+	@Deprecated
 	public static < T > MixedTransformView< T > offset( final RandomAccessible< T > randomAccessible, final long... offset )
 	{
-		final int n = randomAccessible.numDimensions();
-		final MixedTransform t = new MixedTransform( n, n );
-		t.setTranslation( offset );
-		return new MixedTransformView< T >( randomAccessible, t );
+		return Views.translateInverse( randomAccessible, offset );
 	}
 
 	/**
 	 * Translate such that pixel at offset in interval is at the origin in the
 	 * resulting view. This is equivalent to translating by -offset.
+	 *
+	 * @deprecated Please use
+	 *             {@link Views#translateInverse(RandomAccessibleInterval, long...)}
+	 *             instead.
 	 *
 	 * @param interval
 	 *            the source
@@ -472,19 +579,10 @@ public class Views
 	 *            offset of the source view. The pixel at offset becomes the
 	 *            origin of resulting view.
 	 */
+	@Deprecated
 	public static < T > IntervalView< T > offset( final RandomAccessibleInterval< T > interval, final long... offset )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( min );
-		interval.max( max );
-		for ( int d = 0; d < n; ++d )
-		{
-			min[ d ] -= offset[ d ];
-			max[ d ] -= offset[ d ];
-		}
-		return Views.interval( Views.offset( ( RandomAccessible< T > ) interval, offset ), min, max );
+		return Views.translateInverse( interval, offset );
 	}
 
 	/**
@@ -496,17 +594,12 @@ public class Views
 	 */
 	public static < T > IntervalView< T > zeroMin( final RandomAccessibleInterval< T > interval )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		final long[] offset = new long[ n ];
+		final Mixed t = ViewTransforms.zeroMin( interval );
+		final long[] offset = new long[ interval.numDimensions() ];
 		interval.min( offset );
-		interval.max( max );
-		for ( int d = 0; d < n; ++d )
-			max[ d ] -= offset[ d ];
-		final MixedTransform t = new MixedTransform( n, n );
-		t.setTranslation( offset );
-		return Views.interval( new MixedTransformView< T >( interval, t ), min, max );
+		final long[] translation = Arrays.stream( offset ).map( o -> -o ).toArray();
+		final Interval newInterval = Intervals.translate( interval, translation );
+		return Views.interval( new MixedTransformView<>( interval, t ), newInterval );
 	}
 
 	/**
@@ -516,34 +609,8 @@ public class Views
 	public static < T > MixedTransformView< T > hyperSlice( final RandomAccessible< T > view, final int d, final long pos )
 	{
 		final int m = view.numDimensions();
-		final int n = m - 1;
-		final MixedTransform t = new MixedTransform( n, m );
-		final long[] translation = new long[ m ];
-		translation[ d ] = pos;
-		final boolean[] zero = new boolean[ m ];
-		final int[] component = new int[ m ];
-		for ( int e = 0; e < m; ++e )
-		{
-			if ( e < d )
-			{
-				zero[ e ] = false;
-				component[ e ] = e;
-			}
-			else if ( e > d )
-			{
-				zero[ e ] = false;
-				component[ e ] = e - 1;
-			}
-			else
-			{
-				zero[ e ] = true;
-				component[ e ] = 0;
-			}
-		}
-		t.setTranslation( translation );
-		t.setComponentZero( zero );
-		t.setComponentMapping( component );
-		return new MixedTransformView< T >( view, t );
+		final Mixed t = ViewTransforms.hyperSlice( m, d, pos );
+		return new MixedTransformView<>( view, t );
 	}
 
 	/**
@@ -552,24 +619,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > hyperSlice( final RandomAccessibleInterval< T > view, final int d, final long pos )
 	{
-		final int m = view.numDimensions();
-		final int n = m - 1;
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		for ( int e = 0; e < m; ++e )
-		{
-			if ( e < d )
-			{
-				min[ e ] = view.min( e );
-				max[ e ] = view.max( e );
-			}
-			else if ( e > d )
-			{
-				min[ e - 1 ] = view.min( e );
-				max[ e - 1 ] = view.max( e );
-			}
-		}
-		return Views.interval( Views.hyperSlice( ( RandomAccessible< T > ) view, d, pos ), min, max );
+		return Views.interval( Views.hyperSlice( ( RandomAccessible< T > ) view, d, pos ), Intervals.hyperSlice( view, d ) );
 	}
 
 	/**
@@ -586,9 +636,8 @@ public class Views
 	public static < T > MixedTransformView< T > addDimension( final RandomAccessible< T > randomAccessible )
 	{
 		final int m = randomAccessible.numDimensions();
-		final int n = m + 1;
-		final MixedTransform t = new MixedTransform( n, m );
-		return new MixedTransformView< T >( randomAccessible, t );
+
+		return new MixedTransformView<>( randomAccessible, ViewTransforms.addDimension( m ) );
 	}
 
 	/**
@@ -609,17 +658,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > addDimension( final RandomAccessibleInterval< T > interval, final long minOfNewDim, final long maxOfNewDim )
 	{
-		final int m = interval.numDimensions();
-		final long[] min = new long[ m + 1 ];
-		final long[] max = new long[ m + 1 ];
-		for ( int d = 0; d < m; ++d )
-		{
-			min[ d ] = interval.min( d );
-			max[ d ] = interval.max( d );
-		}
-		min[ m ] = minOfNewDim;
-		max[ m ] = maxOfNewDim;
-		return Views.interval( Views.addDimension( interval ), min, max );
+		return Views.interval( Views.addDimension( interval ), Intervals.addDimension( interval, minOfNewDim, maxOfNewDim ) );
 	}
 
 	/**
@@ -633,11 +672,7 @@ public class Views
 	public static < T > MixedTransformView< T > invertAxis( final RandomAccessible< T > randomAccessible, final int d )
 	{
 		final int n = randomAccessible.numDimensions();
-		final boolean[] inv = new boolean[ n ];
-		inv[ d ] = true;
-		final MixedTransform t = new MixedTransform( n, n );
-		t.setComponentInversion( inv );
-		return new MixedTransformView< T >( randomAccessible, t );
+		return new MixedTransformView<>( randomAccessible, ViewTransforms.invertAxis( n, d ) );
 	}
 
 	/**
@@ -650,15 +685,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > invertAxis( final RandomAccessibleInterval< T > interval, final int d )
 	{
-		final int n = interval.numDimensions();
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( min );
-		interval.max( max );
-		final long tmp = min[ d ];
-		min[ d ] = -max[ d ];
-		max[ d ] = -tmp;
-		return Views.interval( Views.invertAxis( ( RandomAccessible< T > ) interval, d ), min, max );
+		return Views.interval( Views.invertAxis( ( RandomAccessible< T > ) interval, d ), Intervals.invertAxis( interval, d ) );
 	}
 
 	/**
@@ -698,15 +725,7 @@ public class Views
 	 */
 	public static < T > IntervalView< T > offsetInterval( final RandomAccessible< T > randomAccessible, final Interval interval )
 	{
-		final int n = randomAccessible.numDimensions();
-		final long[] offset = new long[ n ];
-		final long[] min = new long[ n ];
-		final long[] max = new long[ n ];
-		interval.min( offset );
-		interval.max( max );
-		for ( int d = 0; d < n; ++d )
-			max[ d ] -= offset[ d ];
-		return Views.interval( Views.offset( randomAccessible, offset ), min, max );
+		return Views.zeroMin( Views.interval( randomAccessible, interval ) );
 	}
 
 	/**
@@ -746,7 +765,7 @@ public class Views
 			if ( raiType.isInstance( o ) )
 				return ( IterableInterval< T > ) randomAccessibleInterval;
 		}
-		return new IterableRandomAccessibleInterval< T >( randomAccessibleInterval );
+		return new IterableRandomAccessibleInterval<>( randomAccessibleInterval );
 	}
 
 	/**
@@ -771,7 +790,7 @@ public class Views
 			if ( raiType.isInstance( o ) )
 				return ( IterableInterval< T > ) randomAccessibleInterval;
 		}
-		return new IterableRandomAccessibleInterval< T >( randomAccessibleInterval );
+		return new IterableRandomAccessibleInterval<>( randomAccessibleInterval );
 	}
 
 	/**
@@ -787,7 +806,7 @@ public class Views
 	 */
 	public static < T > CompositeIntervalView< T, ? extends GenericComposite< T > > collapse( final RandomAccessibleInterval< T > source )
 	{
-		return new CompositeIntervalView< T, GenericComposite< T > >( source, new GenericComposite.Factory< T >() );
+		return new CompositeIntervalView<>( source, new GenericComposite.Factory<>() );
 	}
 
 	/**
@@ -803,7 +822,7 @@ public class Views
 	 */
 	public static < T extends RealType< T > > CompositeIntervalView< T, RealComposite< T > > collapseReal( final RandomAccessibleInterval< T > source )
 	{
-		return new CompositeIntervalView< T, RealComposite< T > >( source, new RealComposite.Factory< T >( ( int ) source.dimension( source.numDimensions() - 1 ) ) );
+		return new CompositeIntervalView<>( source, new RealComposite.Factory<>( ( int ) source.dimension( source.numDimensions() - 1 ) ) );
 	}
 
 	/**
@@ -819,7 +838,7 @@ public class Views
 	 */
 	public static < T extends NumericType< T > > CompositeIntervalView< T, NumericComposite< T > > collapseNumeric( final RandomAccessibleInterval< T > source )
 	{
-		return new CompositeIntervalView< T, NumericComposite< T > >( source, new NumericComposite.Factory< T >( ( int ) source.dimension( source.numDimensions() - 1 ) ) );
+		return new CompositeIntervalView<>( source, new NumericComposite.Factory<>( ( int ) source.dimension( source.numDimensions() - 1 ) ) );
 	}
 
 	/**
@@ -835,7 +854,7 @@ public class Views
 	 */
 	public static < T > CompositeView< T, ? extends GenericComposite< T > > collapse( final RandomAccessible< T > source )
 	{
-		return new CompositeView< T, GenericComposite< T > >( source, new GenericComposite.Factory< T >() );
+		return new CompositeView<>( source, new GenericComposite.Factory<>() );
 	}
 
 	/**
@@ -854,7 +873,7 @@ public class Views
 	 */
 	public static < T extends RealType< T > > CompositeView< T, RealComposite< T > > collapseReal( final RandomAccessible< T > source, final int numChannels )
 	{
-		return new CompositeView< T, RealComposite< T > >( source, new RealComposite.Factory< T >( numChannels ) );
+		return new CompositeView<>( source, new RealComposite.Factory<>( numChannels ) );
 	}
 
 	/**
@@ -873,7 +892,7 @@ public class Views
 	 */
 	public static < T extends NumericType< T > > CompositeView< T, NumericComposite< T > > collapseNumeric( final RandomAccessible< T > source, final int numChannels )
 	{
-		return new CompositeView< T, NumericComposite< T > >( source, new NumericComposite.Factory< T >( numChannels ) );
+		return new CompositeView<>( source, new NumericComposite.Factory<>( numChannels ) );
 	}
 
 	/**
@@ -890,7 +909,7 @@ public class Views
 	 */
 	public static < T > SubsampleIntervalView< T > subsample( final RandomAccessibleInterval< T > source, final long step )
 	{
-		return new SubsampleIntervalView< T >( source, step );
+		return new SubsampleIntervalView<>( source, step );
 	}
 
 	/**
@@ -909,7 +928,7 @@ public class Views
 	{
 		assert steps.length >= source.numDimensions(): "Dimensions do not match.";
 
-		return new SubsampleIntervalView< T >( source, steps );
+		return new SubsampleIntervalView<>( source, steps );
 	}
 
 	/**
@@ -926,7 +945,7 @@ public class Views
 	 */
 	public static < T > SubsampleView< T > subsample( final RandomAccessible< T > source, final long step )
 	{
-		return new SubsampleView< T >( source, step );
+		return new SubsampleView<>( source, step );
 	}
 
 	/**
@@ -945,7 +964,7 @@ public class Views
 	{
 		assert steps.length >= source.numDimensions(): "Dimensions do not match.";
 
-		return new SubsampleView< T >( source, steps );
+		return new SubsampleView<>( source, steps );
 	}
 
 	/**
@@ -994,7 +1013,7 @@ public class Views
 	@SafeVarargs
 	public static < T > RandomAccessibleInterval< T > stack( final RandomAccessibleInterval< T >... hyperslices )
 	{
-		return new StackView< T >( Arrays.asList( hyperslices ) );
+		return new StackView<>( Arrays.asList( hyperslices ) );
 	}
 
 	/**
@@ -1034,7 +1053,7 @@ public class Views
 	 */
 	public static < T > RandomAccessibleInterval< T > stack( final StackAccessMode stackAccessMode, final RandomAccessibleInterval< T >... hyperslices )
 	{
-		return new StackView< T >( Arrays.asList( hyperslices ), stackAccessMode );
+		return new StackView<>( Arrays.asList( hyperslices ), stackAccessMode );
 	}
 
 	/**
@@ -1051,13 +1070,10 @@ public class Views
 	 *
 	 * @return {@link TransformView} containing the result.
 	 */
-	public static < T > TransformView< T > shear(
-			final RandomAccessible< T > source,
-			final int shearDimension,
-			final int referenceDimension )
+	public static < T > TransformView< T > shear( final RandomAccessible< T > source, final int shearDimension, final int referenceDimension )
 	{
 		final ShearTransform transform = new ShearTransform( source.numDimensions(), shearDimension, referenceDimension );
-		return new TransformView< T >( source, transform.inverse() );
+		return new TransformView<>( source, transform.inverse() );
 	}
 
 	/**
@@ -1074,13 +1090,10 @@ public class Views
 	 *
 	 * @return {@link TransformView} containing the result.
 	 */
-	public static < T > TransformView< T > unshear(
-			final RandomAccessible< T > source,
-			final int shearDimension,
-			final int referenceDimension )
+	public static < T > TransformView< T > unshear( final RandomAccessible< T > source, final int shearDimension, final int referenceDimension )
 	{
 		final InverseShearTransform transform = new InverseShearTransform( source.numDimensions(), shearDimension, referenceDimension );
-		return new TransformView< T >( source, transform.inverse() );
+		return new TransformView<>( source, transform.inverse() );
 	}
 
 	/**
@@ -1101,11 +1114,7 @@ public class Views
 	 *         interval's dimension are determined by applying the
 	 *         {@link ShearTransform#transform} method on the input interval.
 	 */
-	public static < T > IntervalView< T > shear(
-			final RandomAccessible< T > source,
-			final Interval interval,
-			final int shearDimension,
-			final int referenceDimension )
+	public static < T > IntervalView< T > shear( final RandomAccessible< T > source, final Interval interval, final int shearDimension, final int referenceDimension )
 	{
 		final ShearTransform transform = new ShearTransform( source.numDimensions(), shearDimension, referenceDimension );
 		return Views.interval( Views.shear( source, shearDimension, referenceDimension ), transform.transform( new BoundingBox( interval ) ).getInterval() );
@@ -1129,11 +1138,7 @@ public class Views
 	 *         interval's dimension are determined by applying the
 	 *         {@link ShearTransform#transform} method on the input interval.
 	 */
-	public static < T > IntervalView< T > unshear(
-			final RandomAccessible< T > source,
-			final Interval interval,
-			final int shearDimension,
-			final int referenceDimension )
+	public static < T > IntervalView< T > unshear( final RandomAccessible< T > source, final Interval interval, final int shearDimension, final int referenceDimension )
 	{
 		final InverseShearTransform transform = new InverseShearTransform( source.numDimensions(), shearDimension, referenceDimension );
 		return Views.interval( Views.unshear( source, shearDimension, referenceDimension ), transform.transform( new BoundingBox( interval ) ).getInterval() );
@@ -1153,16 +1158,14 @@ public class Views
 	 *
 	 * @return {@link IntervalView} of permuted source.
 	 */
-	public static < T > IntervalView< T > permuteCoordinates(
-			final RandomAccessibleInterval< T > source,
-			final int[] permutation )
+	public static < T > IntervalView< T > permuteCoordinates( final RandomAccessibleInterval< T > source, final int[] permutation )
 	{
 		assert AbstractPermutationTransform.checkBijectivity( permutation ): "Non-bijective LUT passed for coordinate permuation.";
 		assert PermutationTransform.checkInterval( source, permutation ): "Source interval boundaries do not match permutation.";
 
 		final int nDim = source.numDimensions();
 		final PermutationTransform transform = new PermutationTransform( permutation, nDim, nDim );
-		return Views.interval( new TransformView< T >( source, transform.inverse() ), source );
+		return Views.interval( new TransformView<>( source, transform.inverse() ), source );
 	}
 
 	/**
@@ -1173,17 +1176,14 @@ public class Views
 	 *            must have dimension(dimension) == permutation.length
 	 * @param permutation
 	 *            must be a bijective permutation over its index set, i.e. for a
-	 *            lut of length n, the sorted content the array must be
-	 *            [0,...,n-1] which is the index set of the lut.
+	 *            LUT of length n, the sorted content the array must be
+	 *            [0,...,n-1] which is the index set of the LUT.
 	 * @param d
 	 *            dimension index to be permuted
 	 *
 	 * @return {@link IntervalView} of permuted source.
 	 */
-	public static < T > IntervalView< T > permuteCoordinates(
-			final RandomAccessibleInterval< T > source,
-			final int[] permutation,
-			final int d )
+	public static < T > IntervalView< T > permuteCoordinates( final RandomAccessibleInterval< T > source, final int[] permutation, final int d )
 	{
 		assert AbstractPermutationTransform.checkBijectivity( permutation ): "Non-bijective LUT passed for coordinate permuation.";
 		assert source.min( d ) == 0: "Source with min[d] coordinate != 0 passed to coordinate permutation.";
@@ -1191,7 +1191,7 @@ public class Views
 
 		final int nDim = source.numDimensions();
 		final SingleDimensionPermutationTransform transform = new SingleDimensionPermutationTransform( permutation, nDim, nDim, d );
-		return Views.interval( new TransformView< T >( source, transform.inverse() ), source );
+		return Views.interval( new TransformView<>( source, transform.inverse() ), source );
 	}
 
 	/**
@@ -1208,16 +1208,38 @@ public class Views
 	 *
 	 * @return {@link IntervalView} of permuted source.
 	 */
-	public static < T > IntervalView< T > permuteCoordinatesInverse(
-			final RandomAccessibleInterval< T > source,
-			final int[] permutation )
+	public static < T > IntervalView< T > permuteCoordinatesInverse( final RandomAccessibleInterval< T > source, final int[] permutation )
 	{
 		assert AbstractPermutationTransform.checkBijectivity( permutation ): "Non-bijective LUT passed for coordinate permuation.";
 		assert PermutationTransform.checkInterval( source, permutation ): "Source interval boundaries do not match permutation.";
 
 		final int nDim = source.numDimensions();
 		final PermutationTransform transform = new PermutationTransform( permutation, nDim, nDim ).inverse();
-		return Views.interval( new TransformView< T >( source, transform.inverse() ), source );
+		return Views.interval( new TransformView<>( source, transform.inverse() ), source );
+	}
+
+	/**
+	 * Inverse bijective permutation of the integer coordinates of one dimension
+	 * of a {@link RandomAccessibleInterval}.
+	 *
+	 * @param source
+	 *            must have dimension(dimension) == permutation.length
+	 * @param permutation
+	 *            must be a bijective permutation over its index set, i.e. for a
+	 *            lut of length n, the sorted content the array must be
+	 *            [0,...,n-1] which is the index set of the lut.
+	 * @param d
+	 *            dimension index to be permuted
+	 *
+	 * @return {@link IntervalView} of permuted source.
+	 *
+	 * @deprecated use
+	 *             {@link Views#permuteCoordinatesInverse(RandomAccessibleInterval, int[], int)}
+	 */
+	@Deprecated
+	public static < T > IntervalView< T > permuteCoordinateInverse( final RandomAccessibleInterval< T > source, final int[] permutation, final int d )
+	{
+		return permuteCoordinatesInverse( source, permutation, d );
 	}
 
 	/**
@@ -1235,10 +1257,7 @@ public class Views
 	 *
 	 * @return {@link IntervalView} of permuted source.
 	 */
-	public static < T > IntervalView< T > permuteCoordinateInverse(
-			final RandomAccessibleInterval< T > source,
-			final int[] permutation,
-			final int d )
+	public static < T > IntervalView< T > permuteCoordinatesInverse( final RandomAccessibleInterval< T > source, final int[] permutation, final int d )
 	{
 		assert AbstractPermutationTransform.checkBijectivity( permutation ): "Non-bijective LUT passed for coordinate permuation.";
 		assert source.min( d ) == 0: "Source with min[d] coordinate != 0 passed to coordinate permutation.";
@@ -1246,7 +1265,7 @@ public class Views
 
 		final int nDim = source.numDimensions();
 		final SingleDimensionPermutationTransform transform = new SingleDimensionPermutationTransform( permutation, nDim, nDim, d ).inverse();
-		return Views.interval( new TransformView< T >( source, transform.inverse() ), source );
+		return Views.interval( new TransformView<>( source, transform.inverse() ), source );
 	}
 
 	/**
@@ -1257,11 +1276,9 @@ public class Views
 	 * @param sourceB
 	 * @return
 	 */
-	public static < A, B > RandomAccessible< Pair< A, B > > pair(
-			final RandomAccessible< A > sourceA,
-			final RandomAccessible< B > sourceB )
+	public static < A, B > RandomAccessible< Pair< A, B > > pair( final RandomAccessible< A > sourceA, final RandomAccessible< B > sourceB )
 	{
-		return new RandomAccessiblePair< A, B >( sourceA, sourceB );
+		return new RandomAccessiblePair<>( sourceA, sourceB );
 	}
 
 	/**
@@ -1270,15 +1287,15 @@ public class Views
 	 * <em>n</em>-dimensional {@link RandomAccessible RandomAccessibles} of T.
 	 *
 	 * @param source
-	 * @param axes the axes to become the inner axes (embedded into the co-domain)
+	 * @param axes
+	 *            the axes to become the inner axes (embedded into the
+	 *            co-domain)
 	 *
 	 * @return
 	 */
-	public static < T > RandomAccessible< ? extends RandomAccessible< T > > hyperSlices(
-			final RandomAccessible< T > source,
-			final int... axes )
+	public static < T > RandomAccessible< ? extends RandomAccessible< T > > hyperSlices( final RandomAccessible< T > source, final int... axes )
 	{
-		return new HyperSlicesView< T >( source, axes );
+		return new HyperSlicesView<>( source, axes );
 	}
 
 	/**
@@ -1287,7 +1304,7 @@ public class Views
 	 *
 	 * @param source
 	 *            the interval to expand.
-	 * @param factory
+	 * @param oob
 	 *            the out-of-bounds strategy.
 	 * @return Expansion of the {@link RandomAccessibleInterval} source as
 	 *         specified by oob and border.
@@ -1341,6 +1358,96 @@ public class Views
 	public static < T extends Type< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final T t, final long... border )
 	{
 		return interval( extendValue( source, t ), Intervals.expand( source, border ) );
+	}
+
+	/**
+	 * Expand a RandomAccessibleInterval as specified by border. source will be
+	 * extended with a constant value specified by the caller.
+	 *
+	 * @param source
+	 *            the interval to expand.
+	 * @param value
+	 *            Constant extension of source.
+	 * @return Expansion of the {@link RandomAccessibleInterval} source as
+	 *         specified by t and border.
+	 */
+	public static < T extends RealType< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final float value, final long... border )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setReal( value );
+		return Views.expandValue( source, extension, border );
+	}
+
+	/**
+	 * Expand a RandomAccessibleInterval as specified by border. source will be
+	 * extended with a constant value specified by the caller.
+	 *
+	 * @param source
+	 *            the interval to expand.
+	 * @param value
+	 *            Constant extension of source.
+	 * @return Expansion of the {@link RandomAccessibleInterval} source as
+	 *         specified by t and border.
+	 */
+	public static < T extends RealType< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final double value, final long... border )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setReal( value );
+		return Views.expandValue( source, extension, border );
+	}
+
+	/**
+	 * Expand a RandomAccessibleInterval as specified by border. source will be
+	 * extended with a constant value specified by the caller.
+	 *
+	 * @param source
+	 *            the interval to expand.
+	 * @param value
+	 *            Constant extension of source.
+	 * @return Expansion of the {@link RandomAccessibleInterval} source as
+	 *         specified by t and border.
+	 */
+	public static < T extends IntegerType< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final int value, final long... border )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setInteger( value );
+		return Views.expandValue( source, extension, border );
+	}
+
+	/**
+	 * Expand a RandomAccessibleInterval as specified by border. source will be
+	 * extended with a constant value specified by the caller.
+	 *
+	 * @param source
+	 *            the interval to expand.
+	 * @param value
+	 *            Constant extension of source.
+	 * @return Expansion of the {@link RandomAccessibleInterval} source as
+	 *         specified by t and border.
+	 */
+	public static < T extends IntegerType< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final long value, final long... border )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.setInteger( value );
+		return Views.expandValue( source, extension, border );
+	}
+
+	/**
+	 * Expand a RandomAccessibleInterval as specified by border. source will be
+	 * extended with a constant value specified by the caller.
+	 *
+	 * @param source
+	 *            the interval to expand.
+	 * @param value
+	 *            Constant extension of source.
+	 * @return Expansion of the {@link RandomAccessibleInterval} source as
+	 *         specified by t and border.
+	 */
+	public static < T extends BooleanType< T > > IntervalView< T > expandValue( final RandomAccessibleInterval< T > source, final boolean value, final long... border )
+	{
+		final T extension = Util.getTypeFromInterval( source ).createVariable();
+		extension.set( value );
+		return Views.expandValue( source, extension, border );
 	}
 
 	/**
@@ -1403,4 +1510,96 @@ public class Views
 		return interval( extendBorder( source ), Intervals.expand( source, border ) );
 	}
 
+	/**
+	 *
+	 * Concatenate an array of {@link RandomAccessibleInterval} along the
+	 * provided <code>concatenationAxis</code>. The random access behaves as
+	 * defined by {@link StackView.StackAccessMode#DEFAULT}.
+	 *
+	 * @param concatenationAxis
+	 *            Concatenate along this axis.
+	 * @param sources
+	 *            {@link RandomAccessibleInterval}s to be concatenated.
+	 * @return {@link RandomAccessibleInterval} of concatenated sources.
+	 */
+	@SafeVarargs
+	public static < T > RandomAccessibleInterval< T > concatenate(
+			final int concatenationAxis,
+			final RandomAccessibleInterval< T >... sources )
+	{
+		return concatenate( concatenationAxis, StackView.StackAccessMode.DEFAULT, sources );
+	}
+
+	/**
+	 * Concatenate a list of {@link RandomAccessibleInterval} along the provided
+	 * <code>concatenationAxis</code>. The random access behaves as defined by
+	 * {@link StackView.StackAccessMode#DEFAULT}.
+	 *
+	 * @param concatenationAxis
+	 *            Concatenate along this axis.
+	 * @param sources
+	 *            {@link RandomAccessibleInterval}s to be concatenated.
+	 * @return {@link RandomAccessibleInterval} of concatenated sources.
+	 */
+	public static < T > RandomAccessibleInterval< T > concatenate(
+			final int concatenationAxis,
+			final List< ? extends RandomAccessibleInterval< T > > sources )
+	{
+		return concatenate( concatenationAxis, StackView.StackAccessMode.DEFAULT, sources );
+	}
+
+	/**
+	 * Concatenate an array of {@link RandomAccessibleInterval} along the
+	 * provided <code>concatenationAxis</code>. See
+	 * {@link StackView.StackAccessMode} for behaviors of {@link RandomAccess}.
+	 *
+	 * @param concatenationAxis
+	 *            Concatenate along this axis.
+	 * @param mode
+	 *            Defines how random accesses are moved. See
+	 *            {@link StackView.StackAccessMode} for behaviors of
+	 *            {@link RandomAccess}.
+	 * @param sources
+	 *            {@link RandomAccessibleInterval}s to be concatenated.
+	 * @return {@link RandomAccessibleInterval} of concatenated sources.
+	 */
+	@SafeVarargs
+	public static < T > RandomAccessibleInterval< T > concatenate(
+			final int concatenationAxis,
+			final StackView.StackAccessMode mode,
+			final RandomAccessibleInterval< T >... sources )
+	{
+		return concatenate( concatenationAxis, mode, Arrays.asList( sources ) );
+	}
+
+	/**
+	 * Concatenate a list of {@link RandomAccessibleInterval} along the provided
+	 * <code>concatenationAxis</code>. See {@link StackView.StackAccessMode} for
+	 * behaviors of {@link RandomAccess}.
+	 *
+	 * @param concatenationAxis
+	 *            Concatenate along this axis.
+	 * @param mode
+	 *            Defines how random accesses are moved. See
+	 *            {@link StackView.StackAccessMode} for behaviors of
+	 *            {@link RandomAccess}.
+	 * @param sources
+	 *            {@link RandomAccessibleInterval}s to be concatenated.
+	 * @return {@link RandomAccessibleInterval} of concatenated sources.
+	 */
+	public static < T > RandomAccessibleInterval< T > concatenate(
+			final int concatenationAxis,
+			final StackView.StackAccessMode mode,
+			final List< ? extends RandomAccessibleInterval< T > > sources )
+	{
+		assert sources.size() > 0;
+
+		final ArrayList< RandomAccessibleInterval< T > > hyperSlices = new ArrayList<>();
+		for ( final RandomAccessibleInterval< T > source : sources )
+			for ( long index = source.min( concatenationAxis ); index <= source.max( concatenationAxis ); ++index )
+				hyperSlices.add( Views.hyperSlice( source, concatenationAxis, index ) );
+
+		final RandomAccessibleInterval< T > stacked = Views.stack( mode, hyperSlices );
+		return Views.moveAxis( stacked, stacked.numDimensions() - 1, concatenationAxis );
+	}
 }

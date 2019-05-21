@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -17,7 +17,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,10 +37,9 @@ package net.imglib2.type.numeric.integer;
 import java.math.BigInteger;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.LongAccess;
 import net.imglib2.img.basictypeaccess.array.LongArray;
-import net.imglib2.util.Fraction;
+import net.imglib2.type.NativeTypeFactory;
 import net.imglib2.util.Util;
 
 /**
@@ -53,6 +52,11 @@ import net.imglib2.util.Util;
  */
 public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 {
+
+	private static final double MAX_VALUE_PLUS_ONE = Math.pow( 2, 64 ); // not precise, because double is not sufficient
+
+	private static final double MAX_LONG_PLUS_ONE = Math.pow( 2, 63 ); // not precise, because double is not sufficient
+
 	// this is the constructor if you want it to read from an array
 	public UnsignedLongType( final NativeImg< ?, ? extends LongAccess > img )
 	{
@@ -86,24 +90,17 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	}
 
 	@Override
-	public NativeImg< UnsignedLongType, ? extends LongAccess > createSuitableNativeImg( final NativeImgFactory< UnsignedLongType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg< UnsignedLongType, ? extends LongAccess > container = storageFactory.createLongInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final UnsignedLongType linkedType = new UnsignedLongType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public UnsignedLongType duplicateTypeOnSameNativeImg()
 	{
 		return new UnsignedLongType( img );
+	}
+
+	private static final NativeTypeFactory< UnsignedLongType, LongAccess > typeFactory = NativeTypeFactory.LONG( UnsignedLongType::new );
+
+	@Override
+	public NativeTypeFactory< UnsignedLongType, LongAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
 	}
 
 	@Override
@@ -137,8 +134,8 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	 * Unsigned division of {@code d1} by {@code d2}.
 	 *
 	 * See "Division by Invariant Integers using Multiplication", by Torbjorn
-	 * Granlund and Peter L. Montgomery, 1994.
-	 * <a href="http://gmplib.org/~tege/divcnst-pldi94.pdf">http://gmplib.org/~tege/divcnst-pldi94.pdf</a>
+	 * Granlund and Peter L. Montgomery, 1994. <a href=
+	 * "http://gmplib.org/~tege/divcnst-pldi94.pdf">http://gmplib.org/~tege/divcnst-pldi94.pdf</a>
 	 *
 	 * @throws ArithmeticException
 	 *             when c equals zero.
@@ -148,7 +145,7 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 		if ( d2 < 0 )
 		{
 			// d2 is larger than the maximum signed long value
-			if ( -1 == compare( d1, d2 ) )
+			if ( Long.compareUnsigned( d1, d2 ) < 0 )
 			{
 				// d1 is smaller than d2
 				return 0;
@@ -165,7 +162,7 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 			// Approximate division: exact or one less than the actual value
 			final long quotient = ( ( d1 >>> 1 ) / d2 ) << 1;
 			final long reminder = d1 - quotient * d2;
-			return quotient + ( -1 == compare( d2, reminder ) ? 0 : 1 );
+			return quotient + ( Long.compareUnsigned( d2, reminder ) < 0 ? 0 : 1 );
 		}
 
 		// Exact division, given that both d1 and d2 are smaller than
@@ -183,14 +180,6 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	public void sub( final UnsignedLongType c )
 	{
 		set( get() - c.get() );
-	}
-
-	@Override
-	public int hashCode()
-	{
-		// NB: Use the same hash code as java.lang.Long#hashCode().
-		final long value = get();
-		return ( int ) ( value ^ ( value >>> 32 ) );
 	}
 
 	@Override
@@ -220,7 +209,7 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	@Override
 	public String toString()
 	{
-		return "" + get();
+		return getBigInteger().toString();
 	}
 
 	/**
@@ -278,6 +267,26 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 		set( b.longValue() );
 	}
 
+	@Override
+	public void setReal( double real )
+	{
+		set( doubleToUnsignedLong( real ) );
+	}
+
+	static long doubleToUnsignedLong( double real )
+	{
+		double value = real < MAX_LONG_PLUS_ONE ?
+				Math.max(0, real) :
+				Math.min(-1, real - MAX_VALUE_PLUS_ONE);
+		return Util.round( value );
+	}
+
+	@Override
+	public void setReal( float real )
+	{
+		setReal( (double) real );
+	}
+
 	public void set( final BigInteger bi )
 	{
 		set( bi.longValue() );
@@ -290,7 +299,7 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	@Override
 	public double getMaxValue()
 	{
-		return Math.pow( 2, 64 ) - 1;
+		return MAX_VALUE_PLUS_ONE - 1;
 	} // imprecise
 
 	/**
@@ -308,18 +317,10 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 		return 0;
 	}
 
-	@Override
-	public int compareTo( final UnsignedLongType c )
-	{
-		return compare( get(), c.get() );
-	}
-
 	/**
-	 *
-	 * @param a
-	 * @param b
-	 * @return -1 if {@code a < b}, 0 if {@code a == b}, 1 if {@code a > b}.
+	 * @deprecated Use {@link Long#compareUnsigned(long, long)} instead.
 	 */
+	@Deprecated
 	static public final int compare( final long a, final long b )
 	{
 		if ( a == b )
@@ -346,4 +347,29 @@ public class UnsignedLongType extends GenericLongType< UnsignedLongType >
 	{
 		return new UnsignedLongType( get() );
 	}
+
+	@Override
+	public float getRealFloat()
+	{
+		long l = get();
+		return l >= 0 ? l : ((float) MAX_VALUE_PLUS_ONE + l);
+	}
+
+	@Override
+	public double getRealDouble()
+	{
+		return unsignedLongToDouble( get() );
+	}
+
+	static double unsignedLongToDouble( long l )
+	{
+		return l >= 0 ? l : (MAX_VALUE_PLUS_ONE + l);
+	}
+
+	@Override
+	public int compareTo( final UnsignedLongType other )
+	{
+		return Long.compareUnsigned( get(), other.get() );
+	}
+
 }

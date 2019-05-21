@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -115,7 +115,7 @@ public class SingleDimensionPermutationTransformTest
 		final TransformView< IntType > transformed = new TransformView< IntType >( this.img, transform );
 		final TransformView< IntType > inversed = new TransformView< IntType >( transformed, inverse );
 
-		final IntervalView< IntType > viewTransformed = Views.permuteCoordinateInverse( this.img, this.lut, this.d );
+		final IntervalView< IntType > viewTransformed = Views.permuteCoordinatesInverse( this.img, this.lut, this.d );
 		final IntervalView< IntType > identity = Views.permuteCoordinates( viewTransformed, this.lut, this.d );
 
 		final ArrayCursor< IntType > ref = this.img.cursor();

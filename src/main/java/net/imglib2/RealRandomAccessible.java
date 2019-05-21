@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -47,6 +47,10 @@ package net.imglib2;
  * If your algorithm takes a RealRandomAccessible, this usually means that you
  * expect that the domain is infinite. (In contrast to this,
  * {@link RealRandomAccessibleRealInterval}s have a finite domain.)
+ * </p>
+ * <p>
+ * Similarly to a {@link RandomAccessible}, a {@code RealRandomAccessible} might
+ * be defined only partially within the space.
  * </p>
  * 
  * @author Stephan Saalfeld

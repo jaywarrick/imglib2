@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -37,13 +37,12 @@ package net.imglib2.type.numeric.integer;
 import java.math.BigInteger;
 
 import net.imglib2.img.NativeImg;
-import net.imglib2.img.NativeImgFactory;
 import net.imglib2.img.basictypeaccess.ShortAccess;
-import net.imglib2.util.Fraction;
+import net.imglib2.type.NativeTypeFactory;
 
 /**
  * TODO
- * 
+ *
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
  */
@@ -74,34 +73,27 @@ public class ShortType extends GenericShortType< ShortType >
 	}
 
 	@Override
-	public NativeImg< ShortType, ? extends ShortAccess > createSuitableNativeImg( final NativeImgFactory< ShortType > storageFactory, final long dim[] )
-	{
-		// create the container
-		final NativeImg<ShortType, ? extends ShortAccess> container = storageFactory.createShortInstance( dim, new Fraction() );
-
-		// create a Type that is linked to the container
-		final ShortType linkedType = new ShortType( container );
-
-		// pass it to the NativeContainer
-		container.setLinkedType( linkedType );
-
-		return container;
-	}
-
-	@Override
 	public ShortType duplicateTypeOnSameNativeImg()
 	{
 		return new ShortType( img );
 	}
 
+	private static final NativeTypeFactory< ShortType, ShortAccess > typeFactory = NativeTypeFactory.SHORT( ShortType::new );
+
+	@Override
+	public NativeTypeFactory< ShortType, ShortAccess > getNativeTypeFactory()
+	{
+		return typeFactory;
+	}
+
 	public short get()
 	{
-		return getValue();
+		return getShort();
 	}
 
 	public void set( final short b )
 	{
-		setValue( b );
+		setShort( b );
 	}
 
 	@Override
@@ -135,7 +127,7 @@ public class ShortType extends GenericShortType< ShortType >
 	}
 
 	@Override
-	public void setBigInteger( final BigInteger b)
+	public void setBigInteger( final BigInteger b )
 	{
 		set( b.shortValue() );
 	}
@@ -161,6 +153,6 @@ public class ShortType extends GenericShortType< ShortType >
 	@Override
 	public ShortType copy()
 	{
-		return new ShortType( getValue() );
+		return new ShortType( getShort() );
 	}
 }

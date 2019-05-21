@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -36,7 +36,7 @@ package net.imglib2;
 
 /**
  * An element that can be positioned in n-dimensional real space.
- * 
+ *
  * @author Tobias Pietzsch
  * @author Stephan Preibisch
  * @author Stephan Saalfeld
@@ -45,7 +45,7 @@ public interface RealPositionable extends Positionable
 {
 	/**
 	 * Move the element in one dimension for some distance.
-	 * 
+	 *
 	 * @param distance
 	 * @param d
 	 */
@@ -53,7 +53,7 @@ public interface RealPositionable extends Positionable
 
 	/**
 	 * Move the element in one dimension for some distance.
-	 * 
+	 *
 	 * @param distance
 	 * @param d
 	 */
@@ -62,51 +62,61 @@ public interface RealPositionable extends Positionable
 	/**
 	 * Move the element relative to its current location using a
 	 * {@link RealLocalizable} as distance vector.
-	 * 
-	 * @param localizable
+	 *
+	 * @param distance
+	 *            relative offset, {@link RealLocalizable#numDimensions()} must
+	 *            be &ge; {@link #numDimensions()}
 	 */
-	public void move( RealLocalizable localizable );
+	public void move( RealLocalizable distance );
 
 	/**
 	 * Move the element relative to its current location using a float[] as
 	 * distance vector.
-	 * 
-	 * @param distance
+	 *
+	 * @param distance,
+	 *            length must be &ge; {@link #numDimensions()}
 	 */
 	public void move( float[] distance );
 
 	/**
 	 * Move the element relative to its current location using a float[] as
 	 * distance vector.
-	 * 
-	 * @param distance
+	 *
+	 * @param distance,
+	 *            length must be &ge; {@link #numDimensions()}
 	 */
 	public void move( double[] distance );
 
 	/**
 	 * Place the element at the same location as a given {@link RealLocalizable}
-	 * 
-	 * @param localizable
+	 *
+	 * @param position
+	 *            absolute position, {@link RealLocalizable#numDimensions()}
+	 *            must be &ge; {@link #numDimensions()}
 	 */
-	public void setPosition( RealLocalizable localizable );
+	public void setPosition( RealLocalizable position );
 
 	/**
 	 * Set the position of the element.
-	 * 
+	 *
 	 * @param position
+	 *            absolute position, length must be &ge;
+	 *            {@link #numDimensions()}
 	 */
 	public void setPosition( float position[] );
 
 	/**
 	 * Set the position of the element.
-	 * 
+	 *
 	 * @param position
+	 *            absolute position, length must be &ge;
+	 *            {@link #numDimensions()}
 	 */
 	public void setPosition( double position[] );
 
 	/**
 	 * Set the position of the element for one dimension.
-	 * 
+	 *
 	 * @param position
 	 * @param d
 	 */
@@ -114,7 +124,7 @@ public interface RealPositionable extends Positionable
 
 	/**
 	 * Set the position of the element for one dimension.
-	 * 
+	 *
 	 * @param position
 	 * @param d
 	 */

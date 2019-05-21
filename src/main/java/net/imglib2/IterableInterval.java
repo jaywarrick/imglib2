@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -37,6 +37,16 @@ package net.imglib2;
 /**
  * An {@link IterableRealInterval} whose elements are located at integer
  * coordinates.
+ * <p>
+ * An {@code IterableInterval} is <em>not</em> guaranteed to iterate over all
+ * coordinates of its containing {@link Interval}. In the typical case of a
+ * hyperrectangular image, it will do so; however, there are some
+ * {@code IterableInterval}s which visit only a subset of the {@code Interval}
+ * coordinates. For example, the {@code imglib2-roi} library provides means to
+ * model regions of interest (ROIs), along with the ability to iterate over
+ * coordinates within a particular ROI; see e.g.
+ * {@code net.imglib2.roi.labeling.LabelRegion}.
+ * </p>
  * 
  * @author Tobias Pietzsch
  * @author Stephan Preibisch

@@ -2,7 +2,7 @@
  * #%L
  * ImgLib2: a general-purpose, multidimensional image processing library.
  * %%
- * Copyright (C) 2009 - 2016 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
+ * Copyright (C) 2009 - 2018 Tobias Pietzsch, Stephan Preibisch, Stephan Saalfeld,
  * John Bogovic, Albert Cardona, Barry DeZonia, Christian Dietz, Jan Funke,
  * Aivar Grislis, Jonathan Hale, Grant Harris, Stefan Helfrich, Mark Hiner,
  * Martin Horn, Steffen Jaensch, Lee Kamentsky, Larry Lindsey, Melissa Linkert,
@@ -74,15 +74,6 @@ public class ComplexDoubleTypeTest
 		final ComplexDoubleType i4 = new ComplexDoubleType( 1.234, 5.678 );
 		assertTrue( b.equals( i4 ) );
 		assertTrue( i4.equals( b ) );
-	}
-
-
-	/** Tests {@link ComplexDoubleType#hashCode()}. */
-	@Test
-	public void testHashCode()
-	{
-		final ComplexDoubleType b = new ComplexDoubleType( 1.234, 5.678 );
-		assertEquals( 379318760, b.hashCode() );
 	}
 
 }
